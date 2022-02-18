@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="application24">Icons/application24.png</object>
+  <object class="wxBitmap" name="configure24">Icons/configure24.png</object>
+</resource>
