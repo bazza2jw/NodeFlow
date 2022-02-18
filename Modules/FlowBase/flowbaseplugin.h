@@ -13,12 +13,5 @@
 // scale / offset
 // threshold
 
-namespace NODEFLOW
-{
-    class FlowBasePlugin : public Plugin
-    {
-    public:
-        FlowBasePlugin() : Plugin("FlowBase") {}
-    };
-}
+
 #endif // FLOWBASEPLUGIN_H

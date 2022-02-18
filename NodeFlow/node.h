@@ -22,6 +22,14 @@ typedef std::unique_ptr<ItemList> ItemListPtr;
 #define NODE_RECT_HEIGHT_MARGIN (10)
 #define NODE_TITLE_BAR_HEIGHT (20)
 //
+#define DATA_PAYLOAD "payload"
+#define DATA_TOPIC "topic"
+#define DATA_MSGID "msgid"
+#define VALUE_TAG "Value"
+#define STATE_TAG "State"
+
+
+//
 class NodeSet;
 class NodeLayout;
 class NodeType;
@@ -41,7 +49,7 @@ class Node
     std::vector<ItemListPtr> _outputs; // the outputs from the node
     bool _selected = false;
     wxColour _colour; // node colour
-    MRL::VariantMap _data; // data for processing - runtime volatile
+    VALUE _data; // data for processing - runtime volatile
     VALUEMAP _calculatedData; // cache calculated data
     bool _enabled = true; // is the node active
     bool _calculated = false; // has the output been calculated
@@ -58,7 +66,7 @@ public:
     const NodeLayout &layout();
     NodeType * nodeType() const;
     //
-    MRL::VariantMap  & data() { return _data;}
+    VALUE & data() { return _data;}
     VALUEMAP & calculatedData() { return _calculatedData;}
     //
     unsigned id() const {

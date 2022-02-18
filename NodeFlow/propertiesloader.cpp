@@ -1,4 +1,4 @@
-#include "propertiesloader.h"
+#include "NodeFlow/propertiesloader.h"
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 #include <wx/propgrid/propgrid.h>
@@ -24,13 +24,39 @@ void  PropertiesLoader::setProperties(wxArrayString &props)
 }
 
 /*!
+ * \brief PropertiesLoader::setProperty
+ * \param props
+ * \return
+ */
+wxPGProperty *  PropertiesLoader::setProperty(const wxString &props)
+{
+        wxStringTokenizer t(props, ","); // tokenise the string
+        wxArrayString as;
+        as.clear();
+        while (t.HasMoreTokens()) {
+            wxString token = t.GetNextToken();
+            as.push_back(token);
+        }
+        wxPGProperty * p = setProperty(as);
+        if(p)
+        {
+            _fields.push_back(p);
+        }
+        return p;
+}
+
+
+/*!
  * \brief PropertiesLoader::addBoolProperty
  * \param name
  * \param f
  */
-void PropertiesLoader::addBoolProperty(const wxString &label, const wxString &name, bool f)
+wxBoolProperty * PropertiesLoader::addBoolProperty(const wxString &label, const wxString &name, bool f)
 {
-    _fields.push_back(_prop->Append(new wxBoolProperty(label, name, f)));
+    wxBoolProperty *ret = new wxBoolProperty(label, name, f);
+    _prop->Append(ret);
+    _fields.push_back(ret);
+    return ret;
 }
 /*!
  * \brief PropertiesLoader::addIntProperty
@@ -39,13 +65,15 @@ void PropertiesLoader::addBoolProperty(const wxString &label, const wxString &na
  * \param min
  * \param max
  */
-void PropertiesLoader::addIntProperty(const wxString &label,const wxString &name, int value, int min, int max)
+wxIntProperty * PropertiesLoader::addIntProperty(const wxString &label,const wxString &name, int value, int min, int max)
 {
-    auto p = _prop->Append(new wxIntProperty(label, name, value));
+    wxIntProperty *p = new wxIntProperty(label, name, value);
+    _prop->Append(p);
     p->SetAttribute(wxPG_ATTR_MAX,max);
     p->SetAttribute(wxPG_ATTR_MIN,min);
     p->SetEditor( wxT("SpinCtrl") );
     _fields.push_back(p);
+    return p;
 }
 /*!
  * \brief PropertiesLoader::addFloatProperty
@@ -54,81 +82,94 @@ void PropertiesLoader::addIntProperty(const wxString &label,const wxString &name
  * \param min
  * \param max
  */
-void PropertiesLoader::addFloatProperty(const wxString &label,const wxString &name, double value, double min, double max)
+wxFloatProperty * PropertiesLoader::addFloatProperty(const wxString &label,const wxString &name, double value, double min, double max)
 {
-    auto p = _prop->Append(new wxFloatProperty(label, name, value));
+    wxFloatProperty * p = new wxFloatProperty(label, name, value);
+    _prop->Append(p);
     p->SetAttribute(wxPG_ATTR_MAX,max);
     p->SetAttribute(wxPG_ATTR_MIN,min);
     _fields.push_back(p);
+    return p;
 }
 /*!
  * \brief PropertiesLoader::addStringProperty
  * \param name
  * \param value
  */
-void PropertiesLoader::addStringProperty(const wxString &label,const wxString &name, const wxString &value)
+wxStringProperty * PropertiesLoader::addStringProperty(const wxString &label,const wxString &name, const wxString &value)
 {
-    _fields.push_back(_prop->Append(new wxStringProperty(label, name, value)));
+    wxStringProperty *p = new wxStringProperty(label, name, value);
+    _prop->Append(p);
+    _fields.push_back(p);
+    return p;
 }
 /*!
  * \brief PropertiesLoader::addChoiceProperty
  * \param name
  * \param value
  */
-void PropertiesLoader::addChoiceProperty(const wxString &label, const wxString &name, int value)
+wxEnumProperty * PropertiesLoader::addChoiceProperty(const wxString &label, const wxString &name, int value, const wxArrayString &labels, const wxArrayInt &values )
 {
-
+    wxEnumProperty *p = new wxEnumProperty(label,name,labels,values);
+    _prop->Append(p);
+    _fields.push_back(p);
+    wxVariant v;
+    p->IntToValue(v,value);
+    p->SetValue(v);
+    return p;
 }
 
 /*!
  * \brief PropertiesLoader::setProperty
  * \param as
  */
-void  PropertiesLoader::setProperty( const wxArrayString &as) {
-
-
+wxPGProperty *  PropertiesLoader::setProperty( const wxArrayString &as) {
     //
     // type,label,name,value,min,max
     //
     char c;
     as[0][0].GetAsChar(&c);
     switch (c) {
-        case 'B': {
-            // bool
-            long v = 0;
-            as[3].ToLong(&v);
-            bool f = v ? true : false;
-            addBoolProperty(as[1], as[2], f);
-        }
-        break;
-        case 'I': {
-            // int
-            long value = 0, min = 0, max =0;
-            as[3].ToLong(&value);
-            as[4].ToLong(&min);
-            as[5].ToLong(&max);
-            addIntProperty(as[1],as[2],value,min,max);
-        }
-        break;
-        case 'F': {
-            //float
-            double value,min,max;
-            as[3].ToDouble(&value);
-            as[4].ToDouble(&min);
-            as[5].ToDouble(&max);
-            addFloatProperty(as[1],as[2],value,min,max);
-        }
-        break;
-        case 'S': {
-            addStringProperty(as[1],as[2],as[3]);
-        }
-        break;
-        case 'C':
-            // choice
-            break;
-        default:
-            // ignore everything else
-            break;
+    case 'B': {
+        // bool
+        long v = 0;
+        as[3].ToLong(&v);
+        bool f = v ? true : false;
+        return addBoolProperty(as[1], as[2], f);
     }
+    break;
+    case 'I': {
+        // int
+        long value = 0, min = 0, max =0;
+        as[3].ToLong(&value);
+        as[4].ToLong(&min);
+        as[5].ToLong(&max);
+        return addIntProperty(as[1],as[2],value,min,max);
+    }
+    break;
+    case 'F': {
+        //float
+        double value,min,max;
+        as[3].ToDouble(&value);
+        as[4].ToDouble(&min);
+        as[5].ToDouble(&max);
+        return addFloatProperty(as[1],as[2],value,min,max);
+    }
+    break;
+    case 'S': {
+        return addStringProperty(as[1],as[2],as[3]);
+    }
+    break;
+    case 'C':
+        // choice
+        break;
+    default:
+        // ignore everything else
+        break;
+    }
+    return nullptr;
 }
+
+
+
 

@@ -70,7 +70,7 @@ bool NODEFLOW::NodeType::evaluate(NodeSet &ns, unsigned nodeId, unsigned id,  VA
     NodePtr  &n = ns.findNode(nodeId);
     if(n)
     {
-        if(n->calculatedData().find(id) == n->calculatedData().end())
+        if(n->calculatedData().find(id) != n->calculatedData().end())
         {
             data = n->calculatedData().at(id); // cached value
             return true;

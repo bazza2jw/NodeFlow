@@ -174,6 +174,8 @@ private:
     std::vector<Connection> _outputs; // connection spec for the outputs
     //
     static unsigned _msgId;
+    //
+
 public:
     /*!
      * \brief NodeType
@@ -332,13 +334,14 @@ public:
      * \brief addType
      * \param s
      */
-    static void addType(const std::string &s)
+    static T * addType(const std::string &s)
     {
         T * p = new T(s);
         if(p)
         {
             p->setup();
         }
+        return p;
     }
     /*!
      * \brief name
@@ -380,9 +383,9 @@ public:
     void setValueData(const std::string &topic, const T &v, VALUE &d)
     {
         // set up a data packet with the basic data
-        d["topic"] = topic;
-        d["payload"] = payload;
-        d["msgid"] = _msgId++;
+        d[DATA_TOPIC] = topic;
+        d[DATA_PAYLOAD] = v;
+        d[DATA_MSGID] = _msgId++;
     }
     /*!
      * \brief process process data from an input - left to right flow evaluate outputs before inputs
@@ -456,7 +459,7 @@ public:
         return _outputs;
     }
     //
-    virtual const NodeLayout & nodeLayout(unsigned nodeId = 0) const
+    virtual NodeLayout & nodeLayout(unsigned nodeId = 0)
     {
         return _layout;
     }

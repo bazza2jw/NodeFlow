@@ -19,13 +19,20 @@ class PropertiesLoader
 public:
     PropertiesLoader(wxPropertyGridManager *prop) : _prop(prop){}
     void setProperties(wxArrayString &props);
-    void setProperty( const wxArrayString &spec);
-    void addBoolProperty(const wxString &label, const wxString &name, bool f);
-    void addIntProperty(const wxString &label,const wxString &name, int value, int min, int max);
-    void addFloatProperty(const wxString &label,const wxString &name, double value, double min, double max);
-    void addStringProperty(const wxString &label,const wxString &name, const wxString &value);
-    void addChoiceProperty(const wxString &label,const wxString &name, int value);
-    std::vector<wxPGProperty *> & fields() const { return _fields;}
+    wxPGProperty * setProperty( const wxArrayString &spec);
+    wxPGProperty * setProperty( const wxString &spec);
+
+    wxBoolProperty *addBoolProperty(const wxString &label, const wxString &name, bool f = false);
+    wxIntProperty *addIntProperty(const wxString &label,const wxString &name, int value, int min = -10000000, int max = 10000000);
+    wxIntProperty *addUIntProperty(const wxString &label,const wxString &name, unsigned value, unsigned min = 0, unsigned max = 10000000)
+    {
+        return addIntProperty(label,name, int (value), int(min) , int(max));
+    }
+
+    wxFloatProperty * addFloatProperty(const wxString &label,const wxString &name, double value, double min = -1000000.0, double max = 1000000.0);
+    wxStringProperty * addStringProperty(const wxString &label,const wxString &name, const wxString &value = "");
+    wxEnumProperty * addChoiceProperty(const wxString &label, const wxString &name, int value, const wxArrayString &labels, const wxArrayInt &values = wxArrayInt());
+    std::vector<wxPGProperty *> & fields()  { return _fields;}
 };
 
 #endif // PROPERTIESLOADER_H

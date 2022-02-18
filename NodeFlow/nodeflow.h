@@ -6,7 +6,7 @@ namespace NODEFLOW
     class NodeFlow
     {
     public:
-        NodeFlow();
+        NodeFlow(){};
     };
 }
 #endif // NODEFLOW_H

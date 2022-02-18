@@ -9,26 +9,42 @@
 namespace NODEFLOW
 {
 //
+
+
 // property edit cannot be templated elegantly
 //
 // value source
 //
     template <typename T>
+/*!
+     * \brief The ValueNodeType class
+     */
+
     class ValueNodeType : public NodeType
     {
     public:
+        /*!
+         * \brief ValueNodeType
+         * \param s
+         */
         ValueNodeType(const std::string &s) : NodeType(s) {}
+
+        virtual const char * nodeClass() const { return "Source Values";}
+
+        /*!
+         * \brief trigger
+         * \param ns
+         * \param n
+         */
         void trigger(NodeSet &ns, NodePtr &n )
         {
             if(n && n->enabled())
             {
-                MRL::VariantMap &m = n->data();
-                if(m.find("Value") != m.end()) // get the value parameter
-                {
-                    T v = MRL::valueToType<T>(m["Value"]);
-                    VALUE d(v);
-                    post(ns,n->id(),0,d);
-                }
+                MRL::PropertyPath p;
+                n->toPath(p);
+                T v = ns.data().getValue<T>("Value");
+                VALUE d();
+                post(ns,n->id(),0,d);
             }
         }
 
@@ -36,83 +52,46 @@ namespace NODEFLOW
         {
             inputs().resize(0);
             // set up the outputs
-            outputs().resize(_out);
+            outputs().resize(1);
             outputs()[0] = Connection("out",Multiple);
         }
-
-    };
-
-    class IntegerNodeType  : ValueNodeType<int>
-    {
-    public:
-        IntegerNodeType() : ValueNodeType<int>("Integer") {}
+        /*!
+         * \brief properties
+         * \param parent
+         * \param ns
+         * \param nodeId
+         * \return
+         */
         virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
         {
             MRL::PropertyPath p;
             NodePtr &n = ns.findNode(nodeId);
             n->toPath(p);
             PropertiesEditorDialog dlg(parent,ns.data(),p);
-        }
-    };
-
-    class DoubleNodeType  : ValueNodeType<double>
-    {
-    public:
-        DoubleNodeType() : ValueNodeType<int>("Double") {}
-        virtual bool properties(wxWindow * parent,NodeSet &n, unsigned nodeId);
-    };
-
-    class StringNodeType  : ValueNodeType<std::string>
-    {
-    public:
-        StringNodeType() : ValueNodeType<std::string>("String") {}
-        virtual bool properties(wxWindow * parent,NodeSet &n, unsigned nodeId);
-    };
-
-    class BoolNodeType  : ValueNodeType<bool>
-    {
-    public:
-        BoolNodeType() : ValueNodeType<int>("Bool") {}
-        virtual bool properties(wxWindow * parent,NodeSet &n, unsigned nodeId);
-    };
-
-    class TimerNodeType  : ValueNodeType<int>
-    {
-        wxStopWatch _timer;
-    public:
-        TimerNodeType() : ValueNodeType<int>("Timer")
-        {
-            _timer.Start();
-        }
-
-        void trigger(NodeSet &ns, NodePtr &n )
-        {
-            try
+            //
+            load(dlg,ns,p);
+            if(dlg.ShowModal() == wxID_OK)
             {
-                if(n && n->enabled())
-                {
-                    MRL::VariantMap &m = n->data();
-                    if(m.find("Value") != m.end()) // get the value parameter
-                    {
-                        int i = MRL::valueToType<int>(m["Interval"]);
-                        if(_timer.TimeInMicro()/1000 > i)
-                        {
-                            T v = MRL::valueToType<T>(m["Value"]);
-                            VALUE d(v);
-                            post(ns,n->id(),0,d);
-                            _timer.Start();
-                        }
-                    }
-                }
+                save(dlg,ns,p);
+                return true;
             }
-            catch(...)
-            {
-                n->setEnabled(false);
-            }
+            return false;
         }
 
+        virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+        {
+            dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
+            dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        }
 
-        virtual bool properties(wxWindow * parent,NodeSet &n, unsigned nodeId);
+        virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+        {
+            wxVariant v = dlg.loader().fields()[0]->GetValue();
+            ns.data().setValue(p,"Name",v.GetString().ToStdString());
+            v = dlg.loader().fields()[1]->GetValue();
+            ns.data().setValue(p,"Enabled",v.GetBool());
+        }
+
     };
 
 

@@ -1,6 +1,12 @@
 #include "flowbaseplugin.h"
 
-FlowBasePlugin::FlowBasePlugin()
-{
 
+namespace NODEFLOW
+{
+    class FlowBasePlugin : public Plugin
+    {
+    public:
+        FlowBasePlugin() : Plugin("FlowBase") {}
+
+    } _instance;
 }
