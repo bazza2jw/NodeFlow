@@ -1,12 +1,20 @@
 #include "flowbaseplugin.h"
 
+void addFunctionNodes();
+void addValueNodes();
+void addControlNodes();
 
 namespace NODEFLOW
 {
-    class FlowBasePlugin : public Plugin
+    class FlowBasePlugin
     {
     public:
-        FlowBasePlugin() : Plugin("FlowBase") {}
+        FlowBasePlugin()
+        {
+            addFunctionNodes();
+            addValueNodes();
+            addControlNodes();
+        }
 
     } _instance;
 }

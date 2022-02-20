@@ -5,6 +5,14 @@
 #include <wx/wfstream.h>
 #include <fstream>
 
+
+/*!
+ * \brief CanvasWindows::CanvasWindows
+ * \param parent
+ * \param w
+ * \param h
+ * \param scrollInterval
+ */
 CanvasWindows::CanvasWindows(wxWindow * parent, int w, int h, int scrollInterval) :
     wxScrolled<wxWindow>(parent,wxID_ANY),
     _width(w),
@@ -15,7 +23,9 @@ CanvasWindows::CanvasWindows(wxWindow * parent, int w, int h, int scrollInterval
     _normalPen(*wxBLACK_PEN),
     _selectPen(*wxBLUE,2),
     _erasePen(*wxWHITE,2),
-    _eraseBrush(*wxWHITE_BRUSH)
+    _eraseBrush(*wxWHITE_BRUSH),
+    _connectionFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL),
+    _titleFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL)
 
 {
     SetScrollRate( scrollInterval, scrollInterval);
@@ -243,16 +253,17 @@ void CanvasWindows::drawNode(wxDC &dc, NODEFLOW::NodePtr &n)
     //
     NODEFLOW::NodeType *t = NODEFLOW::NodeType::find(n->type());
     const NODEFLOW::NodeLayout &l = t->nodeLayout(n->id());
-    wxRect r = l.rect();
+    wxRect rn = l.rect();
     //
-    r.SetPosition(n->location());
+    rn.SetPosition(n->location());
     getNodeEdges(n); // set of edges to draw
-    dc.DrawRectangle(r);
+    dc.DrawRectangle(rn);
     //
     {
-        dc.SetBrush(*wxWHITE_BRUSH);
         dc.SetPen(*wxBLACK_PEN);
-
+        dc.SetFont(_connectionFont);
+        wxRect tr(rn.GetLeft(),rn.GetTop() - CONNECTION_SIZE, rn.GetWidth(), CONNECTION_SIZE);
+        dc.DrawLabel(t->name(), tr, wxALIGN_CENTER_HORIZONTAL);
         // Now draw the connectors
         if(l.inputCount())
         {
@@ -260,6 +271,29 @@ void CanvasWindows::drawNode(wxDC &dc, NODEFLOW::NodePtr &n)
             {
                 wxRect r = l.input(i);
                 r.Offset(n->location());
+                //
+                const NODEFLOW::Connection &c = t->inputs()[i];
+                wxRect lr(r.GetLeft(), r.GetTop() - CONNECTION_SIZE , rn.GetWidth()/2, CONNECTION_SIZE );
+                dc.DrawLabel(c.name(),lr,wxALIGN_LEFT);
+
+                switch(l.inputType(i))
+                {
+                case NODEFLOW::Bool :
+                    dc.SetBrush(*wxRED_BRUSH);
+                    break;
+                case NODEFLOW::Integer:
+                    dc.SetBrush(*wxGREEN_BRUSH);
+                    break;
+                case NODEFLOW::Float:
+                    dc.SetBrush(*wxYELLOW_BRUSH);
+                    break;
+                case NODEFLOW::String:
+                    dc.SetBrush(*wxLIGHT_GREY_BRUSH);
+                    break;
+                default:
+                    dc.SetBrush(*wxWHITE_BRUSH);
+                    break;
+                }
                 dc.DrawRectangle(r);
             }
         }
@@ -270,6 +304,31 @@ void CanvasWindows::drawNode(wxDC &dc, NODEFLOW::NodePtr &n)
             {
                 wxRect r = l.output(i);
                 r.Offset(n->location());
+                //
+                wxRect lr(r.GetLeft() - rn.GetWidth()/2, r.GetTop() - CONNECTION_SIZE, rn.GetWidth()/2, CONNECTION_SIZE );
+                const NODEFLOW::Connection &c = t->outputs()[i];
+                dc.DrawLabel(c.name(),lr,wxALIGN_RIGHT);
+                //
+                switch(l.outputType(i))
+                {
+                case NODEFLOW::Bool :
+                    dc.SetBrush(*wxRED_BRUSH);
+                    break;
+                case NODEFLOW::Integer:
+                    dc.SetBrush(*wxGREEN_BRUSH);
+                    break;
+                case NODEFLOW::Float:
+                    dc.SetBrush(*wxYELLOW_BRUSH);
+                    break;
+                case NODEFLOW::String:
+                    dc.SetBrush(*wxLIGHT_GREY_BRUSH);
+                    break;
+
+                default:
+                    dc.SetBrush(*wxWHITE_BRUSH);
+                    break;
+                }
+
                 dc.DrawRectangle(r);
             }
         }

@@ -1,82 +1,92 @@
 #include "valuenodetype.h"
 #include "NodeFlow/nodeset.h"
 
-static class IntegerNodeType  : public  NODEFLOW::ValueNodeType<int>
+class IntegerNodeType  : public  NODEFLOW::ValueNodeType<int,NODEFLOW::Integer>
 {
 public:
-    IntegerNodeType() : ValueNodeType<int>("Integer") {}
+    IntegerNodeType(const std::string &s) : ValueNodeType<int,NODEFLOW::Integer>(s) {}
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<int>::load(dlg,ns,p);
+        ValueNodeType<int,NODEFLOW::Integer>::load(dlg,ns,p);
         dlg.loader().addIntProperty("Value","Value",ns.data().getValue<int>(p,"Value"));
     }
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<int>::save(dlg,ns,p);
+        ValueNodeType<int,NODEFLOW::Integer>::save(dlg,ns,p);
         wxVariant v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetInteger());
     }
-} intInstance;
+};
 
-static class DoubleNodeType  :   public  NODEFLOW::ValueNodeType<double>
+class DoubleNodeType  :   public  NODEFLOW::ValueNodeType<double,NODEFLOW::Float>
 {
 public:
-    DoubleNodeType() : NODEFLOW::ValueNodeType<double>("Double") {}
+    DoubleNodeType(const std::string &s) : NODEFLOW::ValueNodeType<double,NODEFLOW::Float>(s) {}
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<double>::load(dlg,ns,p);
+        ValueNodeType<double,NODEFLOW::Float>::load(dlg,ns,p);
         dlg.loader().addFloatProperty("Value","Value",ns.data().getValue<double>(p,"Value"));
     }
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<double>::save(dlg,ns,p);
+        ValueNodeType<double,NODEFLOW::Float>::save(dlg,ns,p);
         wxVariant v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetDouble());
     }
-} doubleInstance;
+};
 
-class StringNodeType  :  public  NODEFLOW::ValueNodeType<std::string>
+class StringNodeType  :  public  NODEFLOW::ValueNodeType<std::string,NODEFLOW::String>
 {
 public:
-    StringNodeType() : NODEFLOW::ValueNodeType<std::string>("String") {}
+    StringNodeType(const std::string &s) : NODEFLOW::ValueNodeType<std::string,NODEFLOW::String>(s) {}
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<std::string>::load(dlg,ns,p);
+        ValueNodeType<std::string,NODEFLOW::String>::load(dlg,ns,p);
         dlg.loader().addStringProperty("Value","Value",ns.data().getValue<std::string>(p,"Value"));
     }
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<std::string>::save(dlg,ns,p);
+        ValueNodeType<std::string,NODEFLOW::String>::save(dlg,ns,p);
         wxVariant v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetString().ToStdString());
     }
-} stringInstance;
+};
 
-class BoolNodeType  :  public NODEFLOW::ValueNodeType<bool>
+class BoolNodeType  :  public NODEFLOW::ValueNodeType<bool,NODEFLOW::Bool>
 {
 public:
-    BoolNodeType() : ValueNodeType<bool>("Bool") {}
+    BoolNodeType(const std::string &s) : ValueNodeType<bool,NODEFLOW::Bool>(s) {}
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<bool>::load(dlg,ns,p);
+        ValueNodeType<bool,NODEFLOW::Bool>::load(dlg,ns,p);
         dlg.loader().addStringProperty("Value","Value",ns.data().getValue<std::string>(p,"Value"));
     }
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<bool>::save(dlg,ns,p);
+        ValueNodeType<bool,NODEFLOW::Bool>::save(dlg,ns,p);
         wxVariant v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetBool());
     }
-} boolInstance;
+};
 
-static class TimerNodeType  :  public NODEFLOW::ValueNodeType<int>
+class TimerNodeType  :  public NODEFLOW::NodeType
 {
     wxStopWatch _timer;
 public:
-    TimerNodeType() : ValueNodeType<int>("Timer")
+    TimerNodeType(const std::string &s) : NodeType(s)
     {
         _timer.Start();
     }
+
+
+    void setupConnections() // this is a trigger source only
+    {
+        inputs().resize(0);
+        // set up the outputs
+        outputs().resize(1);
+        outputs()[0] = Connection("out",Multiple,outType);
+    }
+
 
     void trigger(NODEFLOW::NodeSet &ns, NODEFLOW::NodePtr &n )
     {
@@ -93,7 +103,7 @@ public:
                     if(_timer.TimeInMicro()/1000 > interval)
                     {
                         NODEFLOW::VALUE d;
-                        setValueData("Timer", 0, d);
+                        setValueData("Timer", true, d);
                         post(ns,n->id(),0,d);
                         _timer.Start();
                     }
@@ -106,17 +116,53 @@ public:
         }
     }
 
-    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+
+    bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
     {
-        ValueNodeType<int>::load(dlg,ns,p);
+        MRL::PropertyPath p;
+        NodePtr &n = ns.findNode(nodeId);
+        n->toPath(p);
+        PropertiesEditorDialog dlg(parent,ns.data(),p);
+        //
+        load(dlg,ns,p);
+        if(dlg.ShowModal() == wxID_OK)
+        {
+            save(dlg,ns,p);
+            return true;
+        }
+        return false;
+    }
+
+    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    {
+        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
+        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
         dlg.loader().addIntProperty("Interval (ms)","Value",ns.data().getValue<int>(p,"Value"));
     }
-    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+
+    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<int>::save(dlg,ns,p);
+        wxVariant v = dlg.loader().fields()[0]->GetValue();
+        ns.data().setValue(p,"Name",v.GetString().ToStdString());
+        v = dlg.loader().fields()[1]->GetValue();
+        ns.data().setValue(p,"Enabled",v.GetBool());
         wxVariant v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetInteger());
     }
 
-} timerInstance;
+};
 
+void addValueNodes()
+{
+   NODEFLOW::NodeType::addType<TimerNodeType>("Timer");
+   NODEFLOW::NodeType::addType<BoolNodeType>("Bool");
+   NODEFLOW::NodeType::addType<StringNodeType>("String");
+   NODEFLOW::NodeType::addType<DoubleNodeType>("Double");
+   NODEFLOW::NodeType::addType<IntegerNodeType>("Integer");
+   //
+   NODEFLOW::NodeType::addType<GlobalBoolNodeType>("GlobalBool");
+   NODEFLOW::NodeType::addType<GlobalIntegerType>("GlobalInteger");
+   NODEFLOW::NodeType::addType<GlobalFloatType>("GlobalFloat");
+   NODEFLOW::NodeType::addType<GlobalStringType>("GlobalString");
+   //
+}

@@ -38,6 +38,9 @@ class NodeSet
     //
     MRL::VariantPropertyTree _data;
     //
+    VALUE _inValue; // value input to the set read by node set input nodes
+    VALUE _outValue; // written by node set output nodes
+
 public:
     NodeSet() {}
     virtual ~NodeSet() {}
@@ -211,12 +214,19 @@ public:
     void enumEdges(const EdgeIteratorFunc &f);
 
     //
-    virtual void step();
+    virtual void step(VALUE &in, VALUE &out);
     virtual void start();
     virtual void stop();
     //
     virtual void load();
     virtual void save();
+
+    //
+    VALUE & inValue() const { return _inValue;}
+    VALUE & outValue() const { return _outValue;}
+    void setInValue(VALUE &v) { _inValue = v;}
+    void setOutValue(VALUE &v) { _outValue = v;}
+    //
 
 };
 }

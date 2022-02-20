@@ -93,6 +93,11 @@ class CanvasWindows : public wxScrolled<wxWindow> {
 
     }
 
+
+    wxFont _connectionFont;
+    wxFont _titleFont;
+
+
 public:
 
     CanvasWindows(wxWindow *parent, int w = 2048, int h = 2048, int scrollInterval = 10);

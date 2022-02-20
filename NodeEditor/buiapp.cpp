@@ -15,7 +15,7 @@ bool BuiApp::OnInit()
     wxApp::OnInit(); // parse the command line
     wxInitAllImageHandlers();
     wxXmlResource::Get()->InitAllHandlers();
-    NODEFLOW::Plugin::loadPlugins(); // load all plugins
+    NODEFLOW::Plugin::loadPlugins("/usr/local/NodeFlow/modules"); // load all plugins
     auto w = new NodeEditorMainframe(nullptr);
     w->Show();
     NODEFLOW::Plugin::initialiseAll(); // call the initialise function

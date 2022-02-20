@@ -13,6 +13,7 @@ namespace NODEFLOW
      * \brief The IfElseNodeType class
      * this is packet switching node based on an expresion compare
      */
+
     class IfElseNodeType : public NodeType
     {
      protected:
@@ -35,8 +36,6 @@ namespace NODEFLOW
         };
         IfElseNodeType(const std::string &s = "IfElse") : NodeType(s),_vars(1){}
         virtual const char * nodeClass() const { return "Control";}
-        virtual void setup();
-        virtual void setupConnections();
         //
         bool compile(const std::string &func, const std::string &args = "a")
         {
@@ -116,8 +115,36 @@ namespace NODEFLOW
             ns.data().setValue(p,"Function",f);
         }
 
+        void setupConnections()
+        {
+            inputs().resize(1);
+            inputs()[0] = Connection("in",Multiple,Float);
+            // set up the outputs
+            outputs().resize(2);
+            outputs()[0] = Connection("out",Multiple,Float);
+            outputs()[1] = Connection("else",Multiple,Float);
+        }
 
-    };
+        void setup()
+        {
+            setupConnections();
+            //
+            nodeLayout().setInputCount(inputs().size());
+            nodeLayout().setOutputCount(outputs().size());
+            //
+            int h =  NODE_TITLE_BAR_HEIGHT + NODE_RECT_HEIGHT_MARGIN ; // title
+            h += CONNECTION_SPACE * ((inputs().size() > outputs().size())? inputs().size():outputs().size());
+            wxRect r(0,0,NODE_RECT_WIDTH,h);
+            nodeLayout().setRect(r);
+            //
+            // set the connection positions top of node
+            nodeLayout().addInput(wxPoint(0,CONNECTION_SIZE));
+            nodeLayout().addOutput(wxPoint(NODE_RECT_WIDTH - CONNECTION_SIZE,NODE_TITLE_BAR_HEIGHT)); // if true message goes this way
+            nodeLayout().addOutput(wxPoint(NODE_RECT_WIDTH/2,h - CONNECTION_SIZE )); // the else goes on the bottom
+        }
+
+
+   };
 
     /*!
      * \brief The ElseIfNodeType class
@@ -126,11 +153,28 @@ namespace NODEFLOW
     class ElseIfNodeType : public IfElseNodeType
     {
     public:
-        ElseIfNodeType() : IfElseNodeType("ElseIf"){}
+        ElseIfNodeType(const std::string &s) : IfElseNodeType(s){}
         virtual const char * nodeClass() const { return "Control";}
-        virtual void setup();
 
+        void setup()
+        {
+            setupConnections();
+            //
+            nodeLayout().setInputCount(inputs().size());
+            nodeLayout().setOutputCount(outputs().size());
+            //
+            int h =  NODE_TITLE_BAR_HEIGHT + NODE_RECT_HEIGHT_MARGIN ; // title
+            h += CONNECTION_SPACE * ((inputs().size() > outputs().size())? inputs().size():outputs().size());
+            wxRect r(0,0,NODE_RECT_WIDTH,h);
+            nodeLayout().setRect(r);
+            //
+            // set the connection positions top of node
+            nodeLayout().addInput(wxPoint(0,0));
+            nodeLayout().addOutput(wxPoint(NODE_RECT_WIDTH - CONNECTION_SIZE,NODE_TITLE_BAR_HEIGHT)); // if true message goes this way
+            nodeLayout().addOutput(wxPoint(NODE_RECT_WIDTH/2,h - CONNECTION_SIZE )); // the else goes on the bottom
+        }
     };
+
 
 
 }

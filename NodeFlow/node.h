@@ -48,7 +48,7 @@ class Node
     std::vector<ItemListPtr> _inputs; // the inputs to the node
     std::vector<ItemListPtr> _outputs; // the outputs from the node
     bool _selected = false;
-    wxColour _colour; // node colour
+    wxColour _colour = wxColour(0xFFFFFFFF); // node colour
     VALUE _data; // data for processing - runtime volatile
     VALUEMAP _calculatedData; // cache calculated data
     bool _enabled = true; // is the node active

@@ -25,22 +25,35 @@ unsigned NODEFLOW::NodeSet::addConnect(unsigned nodeFrom, unsigned out, unsigned
             {
                 if(out < st->outputs().size())
                 {
+
                     NodePtr &d = findNode(nodeTo);
                     if(d)
                     {
                         NodeType *dt = NodeType::find(d->type());
                         if(in < dt->inputs().size())
                         {
+                            const Connection &sc = st->outputs()[out];
                             const Connection &dc = dt->inputs()[in];
-                            // how many connections
-                            size_t to = 0;
-                            ItemListPtr &ip =  d->inputs()[in];
-                            if(ip) to = ip->size();
-                            if((dc.mode() == Multiple) ||(to == 0)) // either multiple connections are allowed or there are none
+                            // connection types must match
+                            //
+                            // although JSON values are used many operations are type sensitive
+                            // this is the type of the payload
+                            // a value is a map of values not just the payload
+                            // there are type conversion nodes
+                            //
+                            //
+                            if((dc.type() == Any) || (sc.type() == dc.type())) // is the input of Any type or does the output type equal the input type
                             {
-                                _edgeId++;
-                                connect(_edgeId,nodeFrom,out,nodeTo, in); // create the edge
-                                return _edgeId;
+                                // how many connections
+                                size_t to = 0;
+                                ItemListPtr &ip =  d->inputs()[in];
+                                if(ip) to = ip->size();
+                                if((dc.mode() == Multiple) ||(to == 0)) // either multiple connections are allowed or there are none
+                                {
+                                    _edgeId++;
+                                    connect(_edgeId,nodeFrom,out,nodeTo, in); // create the edge
+                                    return _edgeId;
+                                }
                             }
                         }
                     }
@@ -156,8 +169,9 @@ void NODEFLOW::NodeSet::connect(unsigned id, unsigned nodeFrom, unsigned out, un
 /*!
  * \brief NODEFLOW::NodeSet::step
  */
-void  NODEFLOW::NodeSet::step()
+void  NODEFLOW::NodeSet::step(VALUE &in, VALUE &out)
 {
+    setInValue(in);
     std::vector<unsigned> tl; // trigger list
     // for each node call the step function for the node's type
     // the step function is for periodic processing
@@ -192,6 +206,7 @@ void  NODEFLOW::NodeSet::step()
             }
         }
     }
+    out = outValue(); // return the values
 }
 
 /*!

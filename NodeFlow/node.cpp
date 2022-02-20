@@ -45,6 +45,7 @@ void NODEFLOW::Node::load(NodeSet &s)
     _location.x = t.getValue<int>(p,"X");
     _location.y = t.getValue<int>(p,"Y");
     _colour = wxUint32(t.getValue<unsigned>(p,"Colour"));
+    _enabled= t.getValue<bool>(p,"Enabled");
 }
 /*!
  * \brief NODEFLOW::Node::save
@@ -64,5 +65,6 @@ void NODEFLOW::Node::save(NodeSet &s)
         t.setValue(p,"X",_location.x);
         t.setValue(p,"Y",_location.y);
         t.setValue(p,"Colour",unsigned(_colour.GetRGB()));
+        t.setValue(p,"Enabled",_enabled);
     }
 }

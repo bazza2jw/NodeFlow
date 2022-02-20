@@ -7,10 +7,15 @@ NODEFLOW::NodeType::NodeTypeMap NODEFLOW::NodeType::_map __attribute__ ((init_pr
 NODEFLOW::NodeType::NodeTypeIdMap NODEFLOW::NodeType::_mapId __attribute__ ((init_priority (110))); // map id to factory
 unsigned NODEFLOW::NodeType::_msgId = 100;
 //
+const char * NODEFLOW::NodeType::props[NODEFLOW::NumberConnectionType] =
+{
+    "String,%s,%s, , , ",
+    "Bool,%s,%s,0,0,0",
+    "Integer,%s,%s,0,-10000000,10000000",
+    "Float,%s,%s,0.0,-10000000.0,10000000.0",
+    "String,%s,%s, , , "
+};
 //
-
-
-
 /*!
  * \brief calculate
  * \param ns
@@ -156,12 +161,14 @@ void NODEFLOW::NodeType::setup()
     // set the connection positions
     for(int i = 0 ; i < inputs().size(); i++)
     {
-        _layout.addInput(wxPoint(0,NODE_TITLE_BAR_HEIGHT + i *CONNECTION_SPACE));
+        _layout.addInput(wxPoint(0,NODE_TITLE_BAR_HEIGHT + i *CONNECTION_SPACE),
+                         inputs()[i].type());
     }
 
     for(int i = 0; i < outputs().size(); i++)
     {
-        _layout.addOutput(wxPoint(NODE_RECT_WIDTH - CONNECTION_SIZE,NODE_TITLE_BAR_HEIGHT + i *CONNECTION_SPACE));
+        _layout.addOutput(wxPoint(NODE_RECT_WIDTH - CONNECTION_SIZE,NODE_TITLE_BAR_HEIGHT + i *CONNECTION_SPACE),
+                          outputs()[i].type());
     }
 }
 

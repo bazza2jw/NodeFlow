@@ -134,5 +134,6 @@ void NODEFLOW::Plugin::terminateAll()
         }
     };
     callAllPlugins(f); // terminate and unload
+    _map.clear();
 }
 

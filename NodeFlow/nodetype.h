@@ -9,6 +9,7 @@ namespace NODEFLOW
 //
 class NodeSet;
 class NodeLayout;
+class NodeType;
 //
 typedef std::shared_ptr<Json::Value> VALUEPTR; // data packet mostly between nodes
 //
@@ -19,6 +20,16 @@ typedef enum
     Calculated = 4 // right to left evaluation - left to right flow by default
 } ConnectionMode;
 
+typedef enum
+{
+    Any = 0,
+    Bool,
+    Integer,
+    Float,
+    String,
+    NumberConnectionType
+} ConnectionType;
+
 /*!
  * \brief The Connection class
  */
@@ -26,9 +37,10 @@ class Connection
 {
     std::string _name;
     ConnectionMode _mode = Single;
+    ConnectionType _type = Any;
 public:
     Connection() {}
-    Connection(const std::string &n, ConnectionMode m = Single ) : _name(n),_mode(m) {}
+    Connection(const std::string &n, ConnectionMode m = Single, ConnectionType t = Any  ) : _name(n),_mode(m),_type(t) {}
     Connection(const Connection &) = default;
     virtual ~Connection() {}
     const std::string & name() const {
@@ -39,6 +51,13 @@ public:
     }
     void setMode(ConnectionMode m) {
         _mode = m;
+    }
+
+    ConnectionType type() const {
+        return _type;
+    }
+    void setType(ConnectionType t) {
+        _type = t;
     }
 };
 
@@ -54,8 +73,11 @@ class NodeLayout
 
     std::vector<wxRect> _inputs;
     std::vector<wxRect> _outputs;
-
+    std::vector<ConnectionType> _inputTypes;
+    std::vector<ConnectionType> _outputTypes;
     //
+    static const char * props[NumberConnectionType];
+
 public:
     NodeLayout() {}
     NodeLayout(const NodeLayout &) = default;
@@ -107,7 +129,9 @@ public:
         return _rect;
     }
 
-    void setRect(wxRect r) { _rect = r;}
+    void setRect(wxRect r) {
+        _rect = r;
+    }
     unsigned inputCount() const {
         return _inputCount;
     }
@@ -120,17 +144,19 @@ public:
     void setOutputCount(unsigned i) {
         _outputCount = i;
     }
-    void addInput(const wxPoint pt)
+    void addInput(const wxPoint pt,ConnectionType t = Any)
     {
         wxRect r(0,0,CONNECTION_SIZE,CONNECTION_SIZE);
         r.SetPosition(pt);
         _inputs.push_back(r);
+        _inputTypes.push_back(t);
     }
-    void addOutput(const wxPoint pt)
+    void addOutput(const wxPoint pt,ConnectionType t = Any)
     {
         wxRect r(0,0,CONNECTION_SIZE,CONNECTION_SIZE);
         r.SetPosition(pt);
         _outputs.push_back(r);
+        _outputTypes.push_back(t);
     }
 
     wxRect input(size_t i) const
@@ -149,6 +175,24 @@ public:
             return _outputs[i];
         }
         return wxRect();
+    }
+
+    ConnectionType inputType(size_t i) const
+    {
+        if(i < _inputTypes.size())
+        {
+            return _inputTypes[i];
+        }
+        return Any;
+    }
+
+    ConnectionType outputType(size_t i) const
+    {
+        if(i < _outputTypes.size())
+        {
+            return _outputTypes[i];
+        }
+        return Any;
     }
 
 
@@ -175,6 +219,8 @@ private:
     //
     static unsigned _msgId;
     //
+protected:
+    static const char * props[NumberConnectionType];
 
 public:
     /*!
@@ -188,7 +234,15 @@ public:
         _id = unsigned(hash_obj(_name)); // determine the hash to get unique id, probably
         _mapId[_id] = this;
     }
-
+    /*!
+     * \brief getProps
+     * \param i
+     * \return property string for type
+     */
+    static const char * getProps(ConnectionType i)
+    {
+        return props[i];
+    }
     /*!
      * \brief properties
      * \param n
@@ -293,7 +347,9 @@ public:
      * \brief nodeClass
      * \return  class of node - used to order nodes in UI editor
      */
-    virtual const char * nodeClass() const { return "Base";}
+    virtual const char * nodeClass() const {
+        return "Base";
+    }
     /*!
      * \brief create
      * \param id
