@@ -54,10 +54,13 @@ class BaseInput : public BaseNodeType
     unsigned _value = 0;
 public:
     BaseInput(const std::string &n) : BaseNodeType(n,0,1) {}
+     bool step(NodeSet &/*ns*/, NodePtr & /*node*/) { return true;}
     void trigger(NodeSet &ns, NodePtr &node )
     {
         VALUE v(_value++); // generate an auto incrementing value
-        post(ns,node->id(), BaseNodeType::BaseOutputId,v);
+        VALUE d;
+         setValueData("BASEINPUT", v, d);
+        post(ns,node->id(), BaseNodeType::BaseOutputId,d);
     }
     virtual Node * create(unsigned i)
     {

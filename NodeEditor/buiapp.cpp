@@ -1,5 +1,5 @@
 #include "buiapp.h"
-#include "NodeEditorMainframe.h"
+#include "../NodeFlow/NodeEditorMainframe.h"
 #include "../NodeFlow/nodeflowplugin.h"
 
 BuiApp::BuiApp() : wxApp ()

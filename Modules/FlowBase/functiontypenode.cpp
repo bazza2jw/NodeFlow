@@ -1,18 +1,19 @@
 #include "functiontypenode.h"
-
 #include <fstream>
 #include <istream>
 
 
 
-
+/*!
+ * \brief addFunctionNodes
+ */
 void addFunctionNodes()
 {
 //
 //
-    NODEFLOW::NodeType::addType<TopicChangeTypeNode>("TopicSetter");
-    NODEFLOW::NodeType::addType<TopicFilterTypeNode>("TopicFilter");
-    NODEFLOW::NodeType::addType<FunctionTypeNode>("Function");
+    NODEFLOW::NodeType::addType<NODEFLOW::TopicChangeTypeNode>("TopicSetter");
+    NODEFLOW::NodeType::addType<NODEFLOW::TopicFilterTypeNode>("TopicFilter");
+    NODEFLOW::NodeType::addType<NODEFLOW::FunctionTypeNode>("Function");
 //
 // instance the operators
 //
@@ -44,7 +45,13 @@ void addFunctionNodes()
 // divide needs validation
     {
         auto pt = new    NODEFLOW::BinaryTypeNode<int,int,NODEFLOW::Integer,NODEFLOW::Integer>("IntDivide", [](int a, int b) {
-            return (b != 0.0) ?(a / b):0.0;
+            return (b != 0) ?(a / b):0;
+        });
+        pt->setup();
+    }
+    {
+        auto pt = new    NODEFLOW::BinaryTypeNode<int,int,NODEFLOW::Integer,NODEFLOW::Integer>("IntModulus", [](int a, int b) {
+            return (b != 0) ?(a % b):0;
         });
         pt->setup();
     }
@@ -76,19 +83,28 @@ void addFunctionNodes()
     }
 //
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<double,double>("Minus",[](double a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<double,double,NODEFLOW::Float,NODEFLOW::Float>("Minus",[](double a) {
             return -a;
         });
         pt->setup();
     }
+
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<bool,bool>("Not",[](bool a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<int,int,NODEFLOW::Integer,NODEFLOW::Integer>("IntMinus",[](int a) {
+            return -a;
+        });
+        pt->setup();
+    }
+
+
+    {
+        auto pt = new NODEFLOW::UnaryTypeNode<bool,bool,NODEFLOW::Bool,NODEFLOW::Bool>("Not",[](bool a) {
             return !a;
         });
         pt->setup();
     }
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<unsigned,unsigned>("Compliment",[](unsigned a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<unsigned,unsigned,NODEFLOW::Integer,NODEFLOW::Integer>("Compliment",[](unsigned a) {
             return ~a;
         });
         pt->setup();
@@ -97,25 +113,25 @@ void addFunctionNodes()
 // Type conversion
 //
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<double,int>("DoubleToInt",[](double a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<double,int,NODEFLOW::Float,NODEFLOW::Integer>("DoubleToInt",[](double a) {
             return int(a);
         });
         pt->setup();
     }
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<int,double>("IntToDouble",[](int a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<int,double,NODEFLOW::Integer,NODEFLOW::Float>("IntToDouble",[](int a) {
             return double(a);
         });
         pt->setup();
     }
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<int,bool>("IntToBool",[](int a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<int,bool,NODEFLOW::Integer,NODEFLOW::Bool>("IntToBool",[](int a) {
             return (a != 0);
         });
         pt->setup();
     }
     {
-        auto pt = new NODEFLOW::UnaryTypeNode<double,bool>("DoubleToBool",[](double a) {
+        auto pt = new NODEFLOW::UnaryTypeNode<double,bool,NODEFLOW::Float,NODEFLOW::Bool>("DoubleToBool",[](double a) {
             return (a != 0);
         });
         pt->setup();

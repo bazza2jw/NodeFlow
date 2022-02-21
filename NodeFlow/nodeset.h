@@ -9,14 +9,16 @@
 #include "edge.h"
 //
 #include <functional>
+#include <queue>
 
 
 namespace NODEFLOW
 {
+#define NODE_SET_DIR "/usr/local/NodeFlow/sets/"
 
 typedef std::function<void(NodePtr &)> NodeIteratorFunc;
 typedef std::function<void(EdgePtr &)> EdgeIteratorFunc;
-
+typedef std::queue<VALUE> VALUEQUEUE;
 
 /*!
      * \brief The NodeSet class
@@ -39,14 +41,24 @@ class NodeSet
     MRL::VariantPropertyTree _data;
     //
     VALUE _inValue; // value input to the set read by node set input nodes
-    VALUE _outValue; // written by node set output nodes
+    VALUEQUEUE _outValue; // written by node set output nodes
 
 public:
+    /*!
+     * \brief NodeSet
+     */
     NodeSet() {}
+    /*!
+     * \brief ~NodeSet
+     */
     virtual ~NodeSet() {}
-
+    /*!
+     * \brief clear
+     */
     void clear(); // clear everything
-
+    /*!
+     * \brief clearNodesSelected
+     */
     void clearNodesSelected() // clear node selection flag
     {
         for(auto i = _nodes.begin(); i != _nodes.end(); i++)
@@ -56,7 +68,9 @@ public:
         }
     }
 
-
+    /*!
+     * \brief clearEdgesSelected
+     */
     void clearEdgesSelected() // clear edge selection flag
     {
         for(auto i = _edges.begin(); i != _edges.end(); i++)
@@ -65,7 +79,9 @@ public:
             e->setSelected(false);
         }
     }
-
+    /*!
+     * \brief clearSelected
+     */
     void clearSelected() // clear all selected items
     {
         clearNodesSelected();
@@ -190,6 +206,10 @@ public:
     //
     // Edge database
     //
+    /*!
+     * \brief search
+     * \param e
+     */
     unsigned search(const Edge &e) // look for duplicate
     {
         for(auto i = _edges.begin(); i != _edges.end(); i++)
@@ -199,22 +219,37 @@ public:
         }
         return 0;
     }
-
+    /*!
+     * \brief disconnectNode
+     * \param id
+     */
     void disconnectNode(unsigned id);
 
     EdgePtr _nullEdge;
+    /*!
+     * \brief findEdge
+     * \param id
+     * \return
+     */
     EdgePtr & findEdge(unsigned id)
     {
         auto i = _edges.find(id);
         if(i != _edges.end()) return i->second;
         return _nullEdge;
     }
-
+    /*!
+     * \brief enumNodes
+     * \param f
+     */
     void enumNodes(const NodeIteratorFunc &f);
+    /*!
+     * \brief enumEdges
+     * \param f
+     */
     void enumEdges(const EdgeIteratorFunc &f);
 
     //
-    virtual void step(VALUE &in, VALUE &out);
+    virtual void step(const VALUE &in);
     virtual void start();
     virtual void stop();
     //
@@ -222,10 +257,10 @@ public:
     virtual void save();
 
     //
-    VALUE & inValue() const { return _inValue;}
-    VALUE & outValue() const { return _outValue;}
-    void setInValue(VALUE &v) { _inValue = v;}
-    void setOutValue(VALUE &v) { _outValue = v;}
+    VALUE & inValue()  { return _inValue;}
+    VALUEQUEUE & outValue()  { return _outValue;}
+    void setInValue(const VALUE &v) { _inValue = v;}
+    void setOutValue(const VALUE &v) { _outValue.push(v);}
     //
 
 };

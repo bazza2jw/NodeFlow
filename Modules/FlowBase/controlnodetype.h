@@ -17,6 +17,9 @@ namespace NODEFLOW
     class IfElseNodeType : public NodeType
     {
      protected:
+        /*!
+         * \brief The ParserWithConsts class
+         */
         class ParserWithConsts: public FunctionParser
         {
         public:
@@ -34,15 +37,33 @@ namespace NODEFLOW
         {
             Input = 0, TrueOutput = 0, ElseOutput = 1
         };
+        /*!
+         * \brief IfElseNodeType
+         * \param s
+         */
         IfElseNodeType(const std::string &s = "IfElse") : NodeType(s),_vars(1){}
+        /*!
+         * \brief nodeClass
+         * \return
+         */
         virtual const char * nodeClass() const { return "Control";}
         //
+        /*!
+         * \brief compile
+         * \param func
+         * \param args
+         * \return
+         */
         bool compile(const std::string &func, const std::string &args = "a")
         {
             _vars.resize(1);
             return _parser.Parse(func,args) == -1;
         }
-        //
+        /*!
+         * \brief start
+         * \param ns
+         * \param n
+         */
         virtual void start(NodeSet &ns,  NodePtr &n)
         {
             MRL::PropertyPath p;
@@ -50,7 +71,14 @@ namespace NODEFLOW
             std::string f =  ns.data().getValue<std::string>(p,"Function");
         }
 
-        //
+        /*!
+         * \brief process
+         * \param ns
+         * \param nodeId
+         * \param id
+         * \param data
+         * \return true if processed
+         */
         bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
         {
             NodePtr &n = ns.findNode(nodeId);
@@ -80,7 +108,13 @@ namespace NODEFLOW
             return false;
 
         }
-
+        /*!
+         * \brief properties
+         * \param parent
+         * \param ns
+         * \param nodeId
+         * \return
+         */
         virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
         {
             MRL::PropertyPath p;
@@ -96,14 +130,24 @@ namespace NODEFLOW
             }
             return false;
         }
-
+        /*!
+         * \brief load
+         * \param dlg
+         * \param ns
+         * \param p
+         */
         virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
             dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
             dlg.loader().addStringProperty("Function","Function",ns.data().getValue<std::string>(p,"Function")); // field[2]
         }
-
+        /*!
+         * \brief save
+         * \param dlg
+         * \param ns
+         * \param p
+         */
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             wxVariant v = dlg.loader().fields()[0]->GetValue();
@@ -114,7 +158,9 @@ namespace NODEFLOW
             std::string f = v.GetString().ToStdString();
             ns.data().setValue(p,"Function",f);
         }
-
+        /*!
+         * \brief setupConnections
+         */
         void setupConnections()
         {
             inputs().resize(1);
@@ -124,7 +170,9 @@ namespace NODEFLOW
             outputs()[0] = Connection("out",Multiple,Float);
             outputs()[1] = Connection("else",Multiple,Float);
         }
-
+        /*!
+         * \brief setup
+         */
         void setup()
         {
             setupConnections();
@@ -153,9 +201,19 @@ namespace NODEFLOW
     class ElseIfNodeType : public IfElseNodeType
     {
     public:
+        /*!
+         * \brief ElseIfNodeType
+         * \param s
+         */
         ElseIfNodeType(const std::string &s) : IfElseNodeType(s){}
+        /*!
+         * \brief nodeClass
+         * \return
+         */
         virtual const char * nodeClass() const { return "Control";}
-
+        /*!
+         * \brief setup
+         */
         void setup()
         {
             setupConnections();

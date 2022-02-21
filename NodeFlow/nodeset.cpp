@@ -169,7 +169,7 @@ void NODEFLOW::NodeSet::connect(unsigned id, unsigned nodeFrom, unsigned out, un
 /*!
  * \brief NODEFLOW::NodeSet::step
  */
-void  NODEFLOW::NodeSet::step(VALUE &in, VALUE &out)
+void  NODEFLOW::NodeSet::step(const VALUE &in)
 {
     setInValue(in);
     std::vector<unsigned> tl; // trigger list
@@ -206,7 +206,7 @@ void  NODEFLOW::NodeSet::step(VALUE &in, VALUE &out)
             }
         }
     }
-    out = outValue(); // return the values
+    // the result is  queue of output values
 }
 
 /*!

@@ -1,6 +1,9 @@
 #include "valuenodetype.h"
 #include "NodeFlow/nodeset.h"
-
+#include "NodeFlow/PropertiesEditorDialog.h"
+/*!
+ * \brief The IntegerNodeType class
+ */
 class IntegerNodeType  : public  NODEFLOW::ValueNodeType<int,NODEFLOW::Integer>
 {
 public:
@@ -17,7 +20,9 @@ public:
         ns.data().setValue(p,"Value",v.GetInteger());
     }
 };
-
+/*!
+ * \brief The DoubleNodeType class
+ */
 class DoubleNodeType  :   public  NODEFLOW::ValueNodeType<double,NODEFLOW::Float>
 {
 public:
@@ -34,7 +39,9 @@ public:
         ns.data().setValue(p,"Value",v.GetDouble());
     }
 };
-
+/*!
+ * \brief The StringNodeType class
+ */
 class StringNodeType  :  public  NODEFLOW::ValueNodeType<std::string,NODEFLOW::String>
 {
 public:
@@ -51,7 +58,9 @@ public:
         ns.data().setValue(p,"Value",v.GetString().ToStdString());
     }
 };
-
+/*!
+ * \brief The BoolNodeType class
+ */
 class BoolNodeType  :  public NODEFLOW::ValueNodeType<bool,NODEFLOW::Bool>
 {
 public:
@@ -68,29 +77,40 @@ public:
         ns.data().setValue(p,"Value",v.GetBool());
     }
 };
-
+/*!
+ * \brief The TimerNodeType class
+ */
 class TimerNodeType  :  public NODEFLOW::NodeType
 {
     wxStopWatch _timer;
 public:
+    /*!
+     * \brief TimerNodeType
+     * \param s
+     */
     TimerNodeType(const std::string &s) : NodeType(s)
     {
         _timer.Start();
     }
 
-
+    /*!
+     * \brief setupConnections
+     */
     void setupConnections() // this is a trigger source only
     {
         inputs().resize(0);
         // set up the outputs
         outputs().resize(1);
-        outputs()[0] = Connection("out",Multiple,outType);
+        outputs()[0] = NODEFLOW::Connection("out",NODEFLOW::Multiple,NODEFLOW::Bool);
     }
 
-
+    /*!
+     * \brief trigger
+     * \param ns
+     * \param n
+     */
     void trigger(NODEFLOW::NodeSet &ns, NODEFLOW::NodePtr &n )
     {
-
         try
         {
             if(n && n->enabled())
@@ -116,11 +136,17 @@ public:
         }
     }
 
-
-    bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
+    /*!
+     * \brief properties
+     * \param parent
+     * \param ns
+     * \param nodeId
+     * \return
+     */
+    bool properties(wxWindow * parent,NODEFLOW::NodeSet &ns, unsigned nodeId)
     {
         MRL::PropertyPath p;
-        NodePtr &n = ns.findNode(nodeId);
+        NODEFLOW::NodePtr &n = ns.findNode(nodeId);
         n->toPath(p);
         PropertiesEditorDialog dlg(parent,ns.data(),p);
         //
@@ -132,26 +158,39 @@ public:
         }
         return false;
     }
-
-    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
         dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
         dlg.loader().addIntProperty("Interval (ms)","Value",ns.data().getValue<int>(p,"Value"));
     }
-
-    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         wxVariant v = dlg.loader().fields()[0]->GetValue();
         ns.data().setValue(p,"Name",v.GetString().ToStdString());
         v = dlg.loader().fields()[1]->GetValue();
         ns.data().setValue(p,"Enabled",v.GetBool());
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
+        v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetInteger());
     }
 
 };
 
+/*!
+ * \brief addValueNodes
+ */
 void addValueNodes()
 {
    NODEFLOW::NodeType::addType<TimerNodeType>("Timer");
@@ -160,9 +199,9 @@ void addValueNodes()
    NODEFLOW::NodeType::addType<DoubleNodeType>("Double");
    NODEFLOW::NodeType::addType<IntegerNodeType>("Integer");
    //
-   NODEFLOW::NodeType::addType<GlobalBoolNodeType>("GlobalBool");
-   NODEFLOW::NodeType::addType<GlobalIntegerType>("GlobalInteger");
-   NODEFLOW::NodeType::addType<GlobalFloatType>("GlobalFloat");
-   NODEFLOW::NodeType::addType<GlobalStringType>("GlobalString");
+   NODEFLOW::NodeType::addType<NODEFLOW::GlobalBoolNodeType>("GlobalBool");
+   NODEFLOW::NodeType::addType<NODEFLOW::GlobalIntegerNodeType>("GlobalInteger");
+   NODEFLOW::NodeType::addType<NODEFLOW::GlobalFloatNodeType>("GlobalFloat");
+   NODEFLOW::NodeType::addType<NODEFLOW::GlobalStringNodeType>("GlobalString");
    //
 }

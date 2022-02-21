@@ -16,6 +16,9 @@ namespace NODEFLOW
 
 
 template <typename T, typename R, ConnectionType inType = Any, ConnectionType outType = Any>
+/*!
+ * \brief The BinaryTypeNode class
+ */
 class BinaryTypeNode : public NodeType // two inputs one output
 {
 public:
@@ -147,7 +150,13 @@ public:
             return 0;
         }
     }
-
+    /*!
+     * \brief properties
+     * \param parent
+     * \param ns
+     * \param nodeId
+     * \return
+     */
     virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
     {
         MRL::PropertyPath p;
@@ -163,7 +172,12 @@ public:
         }
         return false;
     }
-
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
@@ -178,7 +192,12 @@ public:
         w->SetValue(v);
         dlg.loader().addBoolProperty("Use DefaultB","UseDefaultB",ns.data().getValue<bool>(p,"UseDefaultB")); // field[1]
     }
-
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         wxVariant v = dlg.loader().fields()[0]->GetValue();
@@ -221,7 +240,11 @@ public:
 
 
 public:
-
+    /*!
+     * \brief BinaryRelationalTypeNode
+     * \param s
+     * \param f
+     */
     BinaryRelationalTypeNode(const std::string s, BINARY_REL_OPFUNC f) : NodeType(s),_op(f)
     {
 
@@ -314,7 +337,7 @@ public:
             VALUE b;
             if(calculate(ns,nodeId,InputA,a) && calculate(ns,nodeId,InputB,b))
             {
-                R r = op(a[DATA_PAYLOAD].as<T>(),b.as<T>()) ;
+                bool r = op(a[DATA_PAYLOAD].as<T>(),b.as<T>()) ;
                 data[DATA_PAYLOAD] = r;
             }
         }
@@ -327,7 +350,7 @@ public:
      * \param b
      * \return a op b
      */
-    R op(T a, T b) {
+    bool op(T a, T b) {
         try
         {
             return _op(a,b);
@@ -337,7 +360,13 @@ public:
             return 0;
         }
     }
-
+    /*!
+     * \brief properties
+     * \param parent
+     * \param ns
+     * \param nodeId
+     * \return
+     */
     virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
     {
         MRL::PropertyPath p;
@@ -353,7 +382,12 @@ public:
         }
         return false;
     }
-
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
@@ -368,7 +402,12 @@ public:
         w->SetValue(v);
         dlg.loader().addBoolProperty("Use DefaultB","UseDefaultB",ns.data().getValue<bool>(p,"UseDefaultB")); // field[1]
     }
-
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         wxVariant v = dlg.loader().fields()[0]->GetValue();
@@ -405,6 +444,11 @@ public:
 
 
 public:
+    /*!
+     * \brief UnaryTypeNode
+     * \param s
+     * \param f
+     */
     UnaryTypeNode(const std::string s, UNARY_OPFUNC f) : NodeType(s),_op(f)
     {
 
@@ -523,10 +567,18 @@ public:
 
 
 public:
+    /*!
+     * \brief TopicChangeTypeNode
+     * \param s
+     */
     TopicChangeTypeNode(const std::string s) : NodeType(s)
     {
 
     }
+    /*!
+     * \brief nodeClass
+     * \return
+     */
     virtual const char * nodeClass() const { return "Topic Changers";}
     /*!
      * \brief setupConnections
@@ -629,7 +681,7 @@ public:
         ns.data().setValue(p,"Name",v.GetString().ToStdString());
         v = dlg.loader().fields()[1]->GetValue();
         ns.data().setValue(p,"Enabled",v.GetBool());
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
+        v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Topic",v.GetString().ToStdString());
     }
 
@@ -651,6 +703,10 @@ public:
     };
 
 public:
+    /*!
+     * \brief TopicFilterTypeNode
+     * \param s
+     */
     TopicFilterTypeNode(const std::string s) : TopicChangeTypeNode(s)
     {
 
@@ -698,6 +754,14 @@ public:
         }
         return false;
     }
+
+    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    {
+        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
+        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        dlg.loader().addStringProperty("Filter Topic","Topic",ns.data().getValue<std::string>(p,"Topic")); // field[2]
+    }
+
 };
 
 
@@ -727,6 +791,12 @@ public:
 
     }
     /*!
+     * \brief nodeClass
+     * \return
+     */
+    virtual const char * nodeClass() const { return "Function";}
+
+    /*!
      * \brief compile
      * \param func
      * \param args
@@ -753,7 +823,14 @@ public:
         compile(f,"a"); // variable a is the input
     }
 
-
+    /*!
+     * \brief process
+     * \param ns
+     * \param nodeId
+     * \param id
+     * \param data
+     * \return
+     */
     virtual bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
     {
         NodePtr &n = ns.findNode(nodeId);
@@ -778,7 +855,9 @@ public:
     }
 
 
-
+    /*!
+     * \brief setupConnections
+     */
     void setupConnections()
     {
         inputs().resize(1);
@@ -793,7 +872,13 @@ public:
 
 //    bool evaluate(NodeSet &ns, unsigned nodeId, unsigned id,  VALUE &data );
 //    virtual bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data);
-
+    /*!
+     * \brief properties
+     * \param parent
+     * \param ns
+     * \param nodeId
+     * \return
+     */
     virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
     {
         MRL::PropertyPath p;
@@ -809,22 +894,37 @@ public:
         }
         return false;
     }
-
-    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath &p)
     {
         dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
         dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
-        dlg.loader().addStringProperty("Function","Function",ns.data().getValue<std::string>(p,"Function")); // field[2]
+        std::string f = ns.data().getValue<std::string>(p,"Function");
+        dlg.loader().addStringProperty("Function","Function",wxString(f)); // field[2]
     }
-
-    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath &p)
     {
         wxVariant v = dlg.loader().fields()[0]->GetValue();
-        ns.data().setValue(p,"Name",v.GetString().ToStdString());
+        std::string n = v.GetString().ToStdString();
+        ns.data().setValue(p,"Name",n);
         v = dlg.loader().fields()[1]->GetValue();
         ns.data().setValue(p,"Enabled",v.GetBool());
-        v = dlg.loader().fields()[2]->GetValue();
-        ns.data().setValue(p,"Function",v.GetString().ToStdString());
+        //
+        wxVariant fv = dlg.loader().fields()[2]->GetValue();
+        std::string f = fv.GetString().ToStdString();
+        ns.data().setValue(p,"Function",f);
+        ns.data().dump();
     }
 
 

@@ -40,9 +40,10 @@ namespace NODEFLOW
                 n->toPath(p);
                 T v = ns.data().getValue<T>("Value");
                 VALUE result;
-                setValueData(data[DATA_TOPIC].asString(),r,result);
+                setValueData(data[DATA_TOPIC].asString(),0,result);
                 return post(ns,nodeId,Output,result);
             }
+            return false;
         }
 
         void setupConnections()
@@ -134,6 +135,7 @@ namespace NODEFLOW
                 VALUE result = data;
                 return post(ns,nodeId,Output,result);
             }
+            return false;
         }
 
         void setupConnections()
@@ -190,7 +192,7 @@ namespace NODEFLOW
             ns.data().setValue(p,"Name",v.GetString().ToStdString());
             v = dlg.loader().fields()[1]->GetValue();
             ns.data().setValue(p,"Enabled",v.GetBool());
-            wxVariant v = dlg.loader().fields()[2]->GetValue();
+            v = dlg.loader().fields()[2]->GetValue();
             ns.data().setValue(p,"GlobalName",v.GetString().ToStdString());
         }
 

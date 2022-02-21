@@ -28,6 +28,7 @@ PropertiesEditorDialog::~PropertiesEditorDialog()
  */
 void PropertiesEditorDialog::OnOk(wxCommandEvent& /*event*/)
 {
+
     EndModal(wxID_OK);
 }
 void PropertiesEditorDialog::OnNotes(wxCommandEvent& event)

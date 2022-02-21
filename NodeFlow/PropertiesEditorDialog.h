@@ -17,13 +17,15 @@ public:
     virtual ~PropertiesEditorDialog();
     PropertiesLoader & loader() { return _loader;}
  protected:
-
+    //
     virtual void OnNotes(wxCommandEvent& event);
     virtual void OnSettings(wxCommandEvent& event);
     virtual void OnOk(wxCommandEvent& event);
-
+    //
     virtual void load() {} // read from tree
     virtual void save() {} // write to tree
-
+    //
+    MRL::VariantPropertyTree & data() { return _data;}
+    MRL::PropertyPath & path() { return _path;}
 };
 #endif // PROPERTIESEDITORDIALOG_H

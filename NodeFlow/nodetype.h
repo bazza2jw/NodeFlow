@@ -201,6 +201,8 @@ public:
 
 /*!
  * \brief The NodeType class
+ * This encapsulates all of the node funtions - sometimes it is necessary to derive from Node and have
+ * a variant on the create function esp for node specific data structures/interfaces (eg serial or network)
  */
 class NodeType
 {
