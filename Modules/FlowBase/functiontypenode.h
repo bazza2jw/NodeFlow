@@ -151,28 +151,6 @@ public:
         }
     }
     /*!
-     * \brief properties
-     * \param parent
-     * \param ns
-     * \param nodeId
-     * \return
-     */
-    virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-    {
-        MRL::PropertyPath p;
-        NodePtr &n = ns.findNode(nodeId);
-        n->toPath(p);
-        PropertiesEditorDialog dlg(parent,ns.data(),p);
-        //
-        load(dlg,ns,p);
-        if(dlg.ShowModal() == wxID_OK)
-        {
-            save(dlg,ns,p);
-            return true;
-        }
-        return false;
-    }
-    /*!
      * \brief load
      * \param dlg
      * \param ns
@@ -180,9 +158,7 @@ public:
      */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
-        //
+        NodeType::load(dlg,ns,p);
         char pb[128];
         sprintf(pb,getProps(inType),"DefaultB","DefaultB");
         //
@@ -200,14 +176,11 @@ public:
      */
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        wxVariant v = dlg.loader().fields()[0]->GetValue();
-        ns.data().setValue(p,"Name",v.GetString().ToStdString());
-        v = dlg.loader().fields()[1]->GetValue();
-        ns.data().setValue(p,"Enabled",v.GetBool());
-        wxAny a = (dlg.loader().fields()[2])->GetValue(); // get the default B field
+        NodeType::save(dlg,ns,p);
+        wxAny a = (dlg.loader().fields()[PropField1])->GetValue(); // get the default B field
         T val = a.As<T>();
         ns.data().setValue(p,"DefaultB",val);
-        v = dlg.loader().fields()[3]->GetValue();
+        wxVariant v = dlg.loader().fields()[PropField2]->GetValue();
         ns.data().setValue(p,"UseDefaultB",v.GetBool());
     }
 };
@@ -361,28 +334,6 @@ public:
         }
     }
     /*!
-     * \brief properties
-     * \param parent
-     * \param ns
-     * \param nodeId
-     * \return
-     */
-    virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-    {
-        MRL::PropertyPath p;
-        NodePtr &n = ns.findNode(nodeId);
-        n->toPath(p);
-        PropertiesEditorDialog dlg(parent,ns.data(),p);
-        //
-        load(dlg,ns,p);
-        if(dlg.ShowModal() == wxID_OK)
-        {
-            save(dlg,ns,p);
-            return true;
-        }
-        return false;
-    }
-    /*!
      * \brief load
      * \param dlg
      * \param ns
@@ -390,8 +341,7 @@ public:
      */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        NodeType::load(dlg,ns,p);
         //
         char pb[128];
         sprintf(pb,getProps(inType),"DefaultB","DefaultB");
@@ -410,14 +360,11 @@ public:
      */
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        wxVariant v = dlg.loader().fields()[0]->GetValue();
-        ns.data().setValue(p,"Name",v.GetString().ToStdString());
-        v = dlg.loader().fields()[1]->GetValue();
-        ns.data().setValue(p,"Enabled",v.GetBool());
-        wxAny a = (dlg.loader().fields()[2])->GetValue(); // get the default B field
+        NodeType::save(dlg,ns,p);
+        wxAny a = (dlg.loader().fields()[PropField1])->GetValue(); // get the default B field
         T val = a.As<T>();
         ns.data().setValue(p,"DefaultB",val);
-        v = dlg.loader().fields()[3]->GetValue();
+        wxVariant v = dlg.loader().fields()[PropField2]->GetValue();
         ns.data().setValue(p,"UseDefaultB",v.GetBool());
     }
 };
@@ -634,28 +581,6 @@ public:
     }
 
 
-    /*!
-     * \brief properties
-     * \param parent
-     * \param ns
-     * \param nodeId
-     * \return
-     */
-    virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-    {
-        MRL::PropertyPath p;
-        NodePtr &n = ns.findNode(nodeId);
-        n->toPath(p);
-        PropertiesEditorDialog dlg(parent,ns.data(),p);
-        //
-        load(dlg,ns,p);
-        if(dlg.ShowModal() == wxID_OK)
-        {
-            save(dlg,ns,p);
-            return true;
-        }
-        return false;
-    }
 
     /*!
      * \brief load
@@ -665,8 +590,7 @@ public:
      */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        NodeType::load(dlg,ns,p);
         dlg.loader().addStringProperty("Change Topic","Topic",ns.data().getValue<std::string>(p,"Topic")); // field[2]
     }
     /*!
@@ -677,11 +601,8 @@ public:
      */
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        wxVariant v = dlg.loader().fields()[0]->GetValue();
-        ns.data().setValue(p,"Name",v.GetString().ToStdString());
-        v = dlg.loader().fields()[1]->GetValue();
-        ns.data().setValue(p,"Enabled",v.GetBool());
-        v = dlg.loader().fields()[2]->GetValue();
+        NodeType::save(dlg,ns,p);
+        wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
         ns.data().setValue(p,"Topic",v.GetString().ToStdString());
     }
 
@@ -757,8 +678,7 @@ public:
 
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
-        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        NodeType::load(dlg,ns,p);
         dlg.loader().addStringProperty("Filter Topic","Topic",ns.data().getValue<std::string>(p,"Topic")); // field[2]
     }
 
@@ -870,30 +790,6 @@ public:
     }
 
 
-//    bool evaluate(NodeSet &ns, unsigned nodeId, unsigned id,  VALUE &data );
-//    virtual bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data);
-    /*!
-     * \brief properties
-     * \param parent
-     * \param ns
-     * \param nodeId
-     * \return
-     */
-    virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-    {
-        MRL::PropertyPath p;
-        NodePtr &n = ns.findNode(nodeId);
-        n->toPath(p);
-        PropertiesEditorDialog dlg(parent,ns.data(),p);
-        //
-        load(dlg,ns,p);
-        if(dlg.ShowModal() == wxID_OK)
-        {
-            save(dlg,ns,p);
-            return true;
-        }
-        return false;
-    }
     /*!
      * \brief load
      * \param dlg
@@ -902,8 +798,8 @@ public:
      */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath &p)
     {
-        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        NodeType::load(dlg,ns,p);
+        //
         std::string f = ns.data().getValue<std::string>(p,"Function");
         dlg.loader().addStringProperty("Function","Function",wxString(f)); // field[2]
     }
@@ -915,13 +811,8 @@ public:
      */
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath &p)
     {
-        wxVariant v = dlg.loader().fields()[0]->GetValue();
-        std::string n = v.GetString().ToStdString();
-        ns.data().setValue(p,"Name",n);
-        v = dlg.loader().fields()[1]->GetValue();
-        ns.data().setValue(p,"Enabled",v.GetBool());
-        //
-        wxVariant fv = dlg.loader().fields()[2]->GetValue();
+        NodeType::save(dlg,ns,p);
+        wxVariant fv = dlg.loader().fields()[PropField1]->GetValue();
         std::string f = fv.GetString().ToStdString();
         ns.data().setValue(p,"Function",f);
         ns.data().dump();

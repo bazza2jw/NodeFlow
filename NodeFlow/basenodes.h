@@ -62,12 +62,6 @@ public:
          setValueData("BASEINPUT", v, d);
         post(ns,node->id(), BaseNodeType::BaseOutputId,d);
     }
-    virtual Node * create(unsigned i)
-    {
-        Node * n = NodeType::create(i);
-        n->setColour(*wxRED);
-        return n;
-    }
 
 };
 
@@ -83,12 +77,6 @@ public:
         // log the data
         std::cerr << "Node Id:"   << nodeId << " InputId:" << id << " Value:" << data << std::endl;
         return true;
-    }
-    virtual Node * create(unsigned i)
-    {
-        Node * n = NodeType::create(i);
-        n->setColour(*wxYELLOW);
-        return n;
     }
 };
 
@@ -106,12 +94,6 @@ public:
         std::cerr << "Node Id:"   << nodeId << " InputId:" << id << " Value:" << data << std::endl;
         post(ns,nodeId,BaseOutputId,data);
         return true;
-    }
-    virtual Node * create(unsigned i)
-    {
-        Node * n = NodeType::create(i);
-        n->setColour(*wxGREEN);
-        return n;
     }
 
 };

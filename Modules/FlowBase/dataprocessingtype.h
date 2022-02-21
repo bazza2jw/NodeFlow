@@ -114,28 +114,7 @@ namespace NODEFLOW
             return false;
         }
 
-        /*!
-         * \brief properties
-         * \param parent
-         * \param ns
-         * \param nodeId
-         * \return
-         */
-        virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-        {
-            MRL::PropertyPath p;
-            NodePtr &n = ns.findNode(nodeId);
-            n->toPath(p);
-            PropertiesEditorDialog dlg(parent,ns.data(),p);
-            //
-            load(dlg,ns,p);
-            if(dlg.ShowModal() == wxID_OK)
-            {
-                save(dlg,ns,p);
-                return true;
-            }
-            return false;
-        }
+
         /*!
          * \brief load
          * \param dlg
@@ -144,8 +123,7 @@ namespace NODEFLOW
          */
         virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
-            dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-            dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+            NodeType::load(dlg,ns,p);
             dlg.loader().addFloatProperty("Scale","Scale",ns.data().getValue<double>(p,"Scale")); // field[2]
             dlg.loader().addFloatProperty("Offset","Offset",ns.data().getValue<double>(p,"Offset")); // field[3]
             //
@@ -158,13 +136,10 @@ namespace NODEFLOW
          */
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
-            wxVariant v = dlg.loader().fields()[0]->GetValue();
-            ns.data().setValue(p,"Name",v.GetString().ToStdString());
-            v = dlg.loader().fields()[1]->GetValue();
-            ns.data().setValue(p,"Enabled",v.GetBool());
-            v = dlg.loader().fields()[2]->GetValue();
+            NodeType::save(dlg,ns,p);
+            wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
             ns.data().setValue(p,"Scale",v.GetDouble());
-            v = dlg.loader().fields()[3]->GetValue();
+            v = dlg.loader().fields()[PropField2]->GetValue();
             ns.data().setValue(p,"Offset",v.GetDouble());
         }
     };
@@ -280,28 +255,6 @@ namespace NODEFLOW
 
 
         /*!
-         * \brief properties
-         * \param parent
-         * \param ns
-         * \param nodeId
-         * \return
-         */
-        virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-        {
-            MRL::PropertyPath p;
-            NodePtr &n = ns.findNode(nodeId);
-            n->toPath(p);
-            PropertiesEditorDialog dlg(parent,ns.data(),p);
-            //
-            load(dlg,ns,p);
-            if(dlg.ShowModal() == wxID_OK)
-            {
-                save(dlg,ns,p);
-                return true;
-            }
-            return false;
-        }
-        /*!
          * \brief load
          * \param dlg
          * \param ns
@@ -309,8 +262,7 @@ namespace NODEFLOW
          */
         virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
-            dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-            dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+            NodeType::load(dlg,ns,p);
             dlg.loader().addFloatProperty("Hi Limit","HiLimit",ns.data().getValue<double>(p,"HiLimit")); // field[2]
             dlg.loader().addFloatProperty("Lo Limit","LoLimit",ns.data().getValue<double>(p,"LoLimit")); // field[3]
             //
@@ -323,13 +275,10 @@ namespace NODEFLOW
          */
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
-            wxVariant v = dlg.loader().fields()[0]->GetValue();
-            ns.data().setValue(p,"Name",v.GetString().ToStdString());
-            v = dlg.loader().fields()[1]->GetValue();
-            ns.data().setValue(p,"Enabled",v.GetBool());
-            v = dlg.loader().fields()[2]->GetValue();
+            NodeType::save(dlg,ns,p);
+            wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
             ns.data().setValue(p,"HiLimit",v.GetDouble());
-            v = dlg.loader().fields()[3]->GetValue();
+            v = dlg.loader().fields()[PropField2]->GetValue();
             ns.data().setValue(p,"LoLimit",v.GetDouble());
         }
     };

@@ -54,42 +54,6 @@ namespace NODEFLOW
             outputs().resize(1);
             outputs()[0] = Connection("out",Multiple,outType);
         }
-        /*!
-         * \brief properties
-         * \param parent
-         * \param ns
-         * \param nodeId
-         * \return
-         */
-        virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-        {
-            MRL::PropertyPath p;
-            NodePtr &n = ns.findNode(nodeId);
-            n->toPath(p);
-            PropertiesEditorDialog dlg(parent,ns.data(),p);
-            //
-            load(dlg,ns,p);
-            if(dlg.ShowModal() == wxID_OK)
-            {
-                save(dlg,ns,p);
-                return true;
-            }
-            return false;
-        }
-
-        virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
-        {
-            dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-            dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
-        }
-
-        virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
-        {
-            wxVariant v = dlg.loader().fields()[0]->GetValue();
-            ns.data().setValue(p,"Name",v.GetString().ToStdString());
-            v = dlg.loader().fields()[1]->GetValue();
-            ns.data().setValue(p,"Enabled",v.GetBool());
-        }
 
     };
 
@@ -147,28 +111,6 @@ namespace NODEFLOW
             outputs()[0] = Connection("out",Multiple,outType);
         }
         /*!
-         * \brief properties
-         * \param parent
-         * \param ns
-         * \param nodeId
-         * \return
-         */
-        virtual bool properties(wxWindow * parent,NodeSet &ns, unsigned nodeId)
-        {
-            MRL::PropertyPath p;
-            NodePtr &n = ns.findNode(nodeId);
-            n->toPath(p);
-            PropertiesEditorDialog dlg(parent,ns.data(),p);
-            //
-            load(dlg,ns,p);
-            if(dlg.ShowModal() == wxID_OK)
-            {
-                save(dlg,ns,p);
-                return true;
-            }
-            return false;
-        }
-        /*!
          * \brief load
          * \param dlg
          * \param ns
@@ -176,8 +118,7 @@ namespace NODEFLOW
          */
         virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
-            dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-            dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+            NodeType::load(dlg,ns,p);
             dlg.loader().addStringProperty("Global Property","Global",ns.data().getValue<std::string>(p,"GlobalName")); // field[2]
         }
         /*!
@@ -188,11 +129,8 @@ namespace NODEFLOW
          */
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
-            wxVariant v = dlg.loader().fields()[0]->GetValue();
-            ns.data().setValue(p,"Name",v.GetString().ToStdString());
-            v = dlg.loader().fields()[1]->GetValue();
-            ns.data().setValue(p,"Enabled",v.GetBool());
-            v = dlg.loader().fields()[2]->GetValue();
+            NodeType::save(dlg,ns,p);
+            wxVariant v = dlg.loader().fields()[2]->GetValue();
             ns.data().setValue(p,"GlobalName",v.GetString().ToStdString());
         }
 

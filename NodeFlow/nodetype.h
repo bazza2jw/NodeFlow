@@ -4,6 +4,8 @@
 #include "node.h"
 #include "propertiesloader.h"
 
+class PropertiesEditorDialog;
+
 namespace NODEFLOW
 {
 //
@@ -204,6 +206,19 @@ public:
  * This encapsulates all of the node funtions - sometimes it is necessary to derive from Node and have
  * a variant on the create function esp for node specific data structures/interfaces (eg serial or network)
  */
+
+// property fields
+enum
+{
+    PropName = 0,
+    PropEnable,
+    PropColour,
+    PropField1,
+    PropField2,
+    PropField3,
+    PropField4
+};
+
 class NodeType
 {
 public:
@@ -251,7 +266,9 @@ public:
      * \param nodeId
      * \return true if ok
      */
-    virtual bool properties(wxWindow * parent,NodeSet &n, unsigned nodeId);
+    virtual bool properties(wxWindow * parent, NodeSet &ns, unsigned nodeId);
+    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p);
+    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p);
     /*!
      * \brief propertiesUpdated
      * \param n

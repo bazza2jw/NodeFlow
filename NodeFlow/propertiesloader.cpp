@@ -58,6 +58,16 @@ wxBoolProperty * PropertiesLoader::addBoolProperty(const wxString &label, const 
     _fields.push_back(ret);
     return ret;
 }
+
+wxColourProperty * PropertiesLoader::addColourProperty(const wxString &label, const wxString &name, wxColour v)
+{
+    wxColourProperty *p = new wxColourProperty(label,name,v);
+    _prop->Append(p);
+    _fields.push_back(p);
+    return p;
+}
+
+
 /*!
  * \brief PropertiesLoader::addIntProperty
  * \param name

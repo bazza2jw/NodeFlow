@@ -16,7 +16,7 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         ValueNodeType<int,NODEFLOW::Integer>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
+        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
         ns.data().setValue(p,"Value",v.GetInteger());
     }
 };
@@ -35,7 +35,7 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         ValueNodeType<double,NODEFLOW::Float>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
+        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
         ns.data().setValue(p,"Value",v.GetDouble());
     }
 };
@@ -54,7 +54,7 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         ValueNodeType<std::string,NODEFLOW::String>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
+        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
         ns.data().setValue(p,"Value",v.GetString().ToStdString());
     }
 };
@@ -73,7 +73,7 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         ValueNodeType<bool,NODEFLOW::Bool>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
+        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
         ns.data().setValue(p,"Value",v.GetBool());
     }
 };
@@ -137,28 +137,6 @@ public:
     }
 
     /*!
-     * \brief properties
-     * \param parent
-     * \param ns
-     * \param nodeId
-     * \return
-     */
-    bool properties(wxWindow * parent,NODEFLOW::NodeSet &ns, unsigned nodeId)
-    {
-        MRL::PropertyPath p;
-        NODEFLOW::NodePtr &n = ns.findNode(nodeId);
-        n->toPath(p);
-        PropertiesEditorDialog dlg(parent,ns.data(),p);
-        //
-        load(dlg,ns,p);
-        if(dlg.ShowModal() == wxID_OK)
-        {
-            save(dlg,ns,p);
-            return true;
-        }
-        return false;
-    }
-    /*!
      * \brief load
      * \param dlg
      * \param ns
@@ -166,8 +144,7 @@ public:
      */
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-        dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+        NodeType::load(dlg,ns,p);
         dlg.loader().addIntProperty("Interval (ms)","Value",ns.data().getValue<int>(p,"Value"));
     }
     /*!
@@ -178,11 +155,8 @@ public:
      */
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        wxVariant v = dlg.loader().fields()[0]->GetValue();
-        ns.data().setValue(p,"Name",v.GetString().ToStdString());
-        v = dlg.loader().fields()[1]->GetValue();
-        ns.data().setValue(p,"Enabled",v.GetBool());
-        v = dlg.loader().fields()[2]->GetValue();
+        NodeType::save(dlg,ns,p);
+        wxVariant v = dlg.loader().fields()[2]->GetValue();
         ns.data().setValue(p,"Value",v.GetInteger());
     }
 

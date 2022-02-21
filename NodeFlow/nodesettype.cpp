@@ -58,8 +58,7 @@ bool NODEFLOW::NodeSetType::properties(wxWindow * parent, NodeSet &ns, unsigned 
  */
 void NODEFLOW::NodeSetType::load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
 {
-    dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
-    dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+    NODEFLOW::NodeType::load(dlg,ns,p);
     dlg.loader().addStringProperty("Node Set","NodeSet",ns.data().getValue<std::string>(p,"NodeSet")); // field[2]
 }
 
@@ -71,11 +70,8 @@ void NODEFLOW::NodeSetType::load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::Pr
  */
 void NODEFLOW::NodeSetType::save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
 {
-    wxVariant v = dlg.loader().fields()[0]->GetValue();
-    ns.data().setValue(p,"Name",v.GetString().ToStdString());
-    v = dlg.loader().fields()[1]->GetValue();
-    ns.data().setValue(p,"Enabled",v.GetBool());
-    v = dlg.loader().fields()[2]->GetValue();
+    NODEFLOW::NodeType::save(dlg,ns,p);
+    wxVariant v = dlg.loader().fields()[3]->GetValue();
     ns.data().setValue(p,"NodeSet",v.GetString().ToStdString());
 }
 

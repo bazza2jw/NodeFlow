@@ -179,14 +179,49 @@ void NODEFLOW::NodeType::setup()
  * \param nodeId
  * \return true if OK
  */
-bool NODEFLOW::NodeType::properties(wxWindow *parent, NodeSet &n, unsigned nodeId)
+bool NODEFLOW::NodeType::properties(wxWindow *parent, NodeSet &ns, unsigned nodeId)
 {
     // property page
-    NodePtr &np = n.findNode(nodeId);
-    MRL::PropertyPath path;
-    np->toPath(path);
-    PropertiesEditorDialog dlg(parent,n.data(),path);
-    dlg.loader().addStringProperty("Name","Name","Node Name");
-    dlg.loader().addBoolProperty("Enable Node","Enable",true);
-    return dlg.ShowModal() == wxID_OK;
+    MRL::PropertyPath p;
+    NodePtr &n = ns.findNode(nodeId);
+    n->toPath(p);
+    PropertiesEditorDialog dlg(parent,ns.data(),p);
+    //
+    load(dlg,ns,p);
+    if(dlg.ShowModal() == wxID_OK)
+    {
+        save(dlg,ns,p);
+        return true;
+    }
+    return false;
 }
+/*!
+ * \brief NODEFLOW::NodeType::load
+ * \param dlg
+ * \param ns
+ * \param p
+ */
+void NODEFLOW::NodeType::load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+{
+    dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
+    dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
+    dlg.loader().addColourProperty("Node Colour","Colour",ns.data().getValue<unsigned>(p,"Colour")); // field[2]
+
+}
+/*!
+ * \brief NODEFLOW::NodeType::save
+ * \param dlg
+ * \param ns
+ * \param p
+ */
+void NODEFLOW::NodeType::save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+{
+    wxVariant v = dlg.loader().fields()[0]->GetValue();
+    ns.data().setValue(p,"Name",v.GetString().ToStdString());
+    v = dlg.loader().fields()[1]->GetValue();
+    ns.data().setValue(p,"Enabled",v.GetBool());
+    wxAny a = dlg.loader().fields()[2]->GetValue();
+    ns.data().setValue(p,"Colour", a.As<wxColour>());
+
+}
+
