@@ -232,7 +232,7 @@
           }, {
            "type": "string",
            "m_label": "Label:",
-           "m_value": "New"
+           "m_value": "New Context"
           }, {
            "type": "string",
            "m_label": "Shortcut:",

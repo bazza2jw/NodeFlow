@@ -1,18 +1,16 @@
 # NodeFlow
 
-This is in development - may work or not
+This is in development 
 
 Node based flow framework in C++ similar in concept to Node Red 
 
-This framework is intended to support both flows and calculations.
 
-The big differences between Node Flow and Node Red are:
+Features
+========
 
-Multiple inputs are supported
+Multiple inputs are supported 
 
 Multiple outputs are supported
-
-Both operation modes are supported, flow and calculate. Though flow (left to right) is being developed first
 
 Plugins are supported 
 
@@ -25,25 +23,56 @@ Binary operators can have the B input defaulted otherwise both A and B inputs ha
 Data packets (JSON Values) can be routed by topic. Topic can be changed.
 
 
-Flows are left to right from outputs to inputs.
-
+Program Structure
+=================
 
 Generally the functions are performed by NodeType derived classes. The other classes hold data.
 
-The NodeSet class is the graph of the nodes (Node) and the connections (Edge). The NodeSet is the execution context.  To run a flow or calculation the NodeSet is executed/processed (by calling step).
+The NodeSet class is the graph of the nodes (Node) and the connections (Edge). The NodeSet is the execution context.  To run a flow  the NodeSet is executed/processed (by calling NodeSet::step). The NodeSet::start function is called to initialise all nodes.
 
 All nodes receive the step call then the trigger call. 
 
 Data / event source nodes emit data on the trigger call. Data is sent from outputs to connected inputs by calling post. The data is received and processed by the process function
 
-The GUI is wxWidgets based. However changing to Qt or Wt (for web based UI) should not be complex. It should be converting to the equivalent classes, most of the code being unchanged.
+Data is passed as Json Values. Each value has a "Topic" attribute and a "Payload" attribute (cf Node Red). Other attributes can be added.
+
+The node set execution flow is:
+
+Call NodeSet::start to initialise the nodes
+
+while 
+    
+    call NodeSet::step. This first invokes NodeType::step for each node. If true is returned by the NodeTypeStep::step the node is ready to be triggered (it is the left most node of the flow). The NodeType::trigger function is now called for these nodes. 
+
+    Data is sent to conencted nodes using the NodeType::post function and processed by the NodeType::process function. The NodeType::process function then posts the results to output(s). This repeats (recurses) until the end of the flow.
+    Flows are executed from start to finish. Flows must not block. The step function can be used to drive state machines. Do not assume any given flow (or branch)  will run before or after any other flow.
+ 
+
+    read the set output queue and process the packets. The output messages can be passed to the UI components, databases etc based on the topic attribute. In the GUI run mode the messages from the node set are displayed in the trace panel.
+
+endwhile
 
 
-The MrlLib from the OpcServant project is required
+GUI
+===
 
-Look at the plugins for how to extend the node set
+The GUI is a graphical node set editor. Drag and drop nodes form the list on the left on to canvas. Connect nodes by left-down on an  output and draging to an input. Right click on a node ot get a context menu that includes editing properties and deleting nodes. To delete connections right click on a input or output and select delete connections.
 
-It is expected to embed Node Flow in other applications as a visual alternative to scripting and configuration
+Node connections have colour coded type. Nodes must be of the same type (Bool, Integer, Float and String) to be connected. There is an Any type that can connect to any other type. 
+
+
+Building
+========
+
+Use cmake to build. 
+
+The GUI is wxWidgets based. However changing to Qt or Wt (for web based UI) should not be complex.
+
+The MrlLib from the OpcServant project is required. Boost is required.
+
+Look at the plugins for how to extend the node set and how to implement functions
+
+It is expected to be able to embed Node Flow in other applications as a visual alternative to scripting and configuration. 
 
 
 

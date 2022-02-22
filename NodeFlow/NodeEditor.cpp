@@ -29,7 +29,7 @@ NodeEditorMainframeBase::NodeEditorMainframeBase(wxWindow* parent, wxWindowID id
     m_menuFile = new wxMenu();
     m_menuBar->Append(m_menuFile, _("File"));
     
-    m_menuItem153 = new wxMenuItem(m_menuFile, wxID_NEW, _("New"), wxT(""), wxITEM_NORMAL);
+    m_menuItem153 = new wxMenuItem(m_menuFile, wxID_NEW, _("New Context"), wxT(""), wxITEM_NORMAL);
     m_menuFile->Append(m_menuItem153);
     
     m_menuItemExit = new wxMenuItem(m_menuFile, wxID_ANY, _("Exit"), wxT(""), wxITEM_NORMAL);
