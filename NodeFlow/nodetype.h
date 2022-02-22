@@ -377,13 +377,19 @@ public:
      */
     Node * createNode(unsigned i)
     {
-        Node * p = create(i);
-        if(p)
+        Node * p = nullptr;
+        try
         {
-            p->setInputs(inputs().size());
-            p->setOutputs(outputs().size());
+            p = create(i);
+            if(p)
+            {
+                p->setInputs(inputs().size());
+                p->setOutputs(outputs().size());
+            }
         }
+        CATCH_DEF
         return p;
+
     }
 
     /*!
@@ -462,6 +468,23 @@ public:
         d[DATA_PAYLOAD] = v;
         d[DATA_MSGID] = _msgId++;
     }
+
+
+    template <typename T>
+    /*!
+     * \brief setValueData
+     * \param topic
+     * \param v
+     * \param d
+     */
+    void setValueData(const VALUE &in, const T &v, VALUE &out)
+    {
+        // set up a data packet copying input data packet
+        out = in;
+        out[DATA_PAYLOAD] = v;
+    }
+
+
     /*!
      * \brief process process data from an input - left to right flow evaluate outputs before inputs
      * \param nodeId this node to process the signal

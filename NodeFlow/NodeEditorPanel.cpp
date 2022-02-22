@@ -85,7 +85,7 @@ void NodeEditorPanel::onOpen(wxCommandEvent& event)
  * \brief NodeEditorPanel::onRun
  * \param event
  */
-void NodeEditorPanel::onRun(wxCommandEvent& event)
+void NodeEditorPanel::onRun(wxCommandEvent& /*event*/)
 {
     if(GetTimerStep()->IsRunning())
     {
@@ -143,6 +143,7 @@ void NodeEditorPanel::onEditRun(wxCommandEvent& /*event*/)
     GetButtonTrigger()->Enable(f);
     GetTimerInterval()->Enable(f);
     GetTimerStep()->Stop();
+    GetButtonStart()->Enable(f);
     _canvas->setEditMode(!f);
 
 }
@@ -163,7 +164,6 @@ void NodeEditorPanel::onStep(wxCommandEvent& /*event*/)
         GetListTrace()->AppendString(s);
         q.pop();
     }
-
 }
 /*!
  * \brief NodeEditorPanel::onTrigger
@@ -186,7 +186,7 @@ void NodeEditorPanel::onTimer(wxTimerEvent& /*event*/)
  */
 void NodeEditorPanel::onInject(wxCommandEvent& /*event*/)
 {
-     wxTextEntryDialog dlg(this, "Enter JSON Input", wxGetTextFromUserPromptStr, "{}");
+     wxTextEntryDialog dlg(this, "Enter JSON Input", wxGetTextFromUserPromptStr, "{\"msgid\":103,\"payload\":123,\"topic\":\"topic\"}");
      if(dlg.ShowModal() == wxID_OK)
      {
          std::string  s = dlg.GetValue().ToStdString();
@@ -195,4 +195,11 @@ void NodeEditorPanel::onInject(wxCommandEvent& /*event*/)
             _canvas->nodeSet().setInValue(_value);
          }
      }
+}
+
+void NodeEditorPanel::onStartSet(wxCommandEvent& /*event*/)
+{
+    // initialise the set of nodes - load runtime data / confg  from the config tree and any other initialisation stuff
+    NODEFLOW::NodeSet &st = _canvas->nodeSet();
+    st.start();
 }

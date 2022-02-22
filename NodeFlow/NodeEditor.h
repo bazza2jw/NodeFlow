@@ -76,6 +76,7 @@ protected:
     wxBoxSizer* canvasSizer;
     wxToolBar* m_toolbar173;
     wxToggleButton* m_toggleEdit;
+    wxButton* m_buttonStart;
     wxButton* m_buttonStep;
     wxButton* m_buttonTrigger;
     wxButton* m_buttonRun;
@@ -89,6 +90,7 @@ protected:
     virtual void onSave(wxCommandEvent& event) { event.Skip(); }
     virtual void onSaveAs(wxCommandEvent& event) { event.Skip(); }
     virtual void onEditRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void onStartSet(wxCommandEvent& event) { event.Skip(); }
     virtual void onStep(wxCommandEvent& event) { event.Skip(); }
     virtual void onTrigger(wxCommandEvent& event) { event.Skip(); }
     virtual void onRun(wxCommandEvent& event) { event.Skip(); }
@@ -103,6 +105,7 @@ public:
     wxPanel* GetSplitterRight() { return m_splitterRight; }
     wxSplitterWindow* GetSplitter() { return m_splitter; }
     wxToggleButton* GetToggleEdit() { return m_toggleEdit; }
+    wxButton* GetButtonStart() { return m_buttonStart; }
     wxButton* GetButtonStep() { return m_buttonStep; }
     wxButton* GetButtonTrigger() { return m_buttonTrigger; }
     wxButton* GetButtonRun() { return m_buttonRun; }

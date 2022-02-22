@@ -32,8 +32,9 @@ namespace NODEFLOW
             inputs().resize(1);
             inputs()[0] = Connection("in",Multiple,Any);
             // set up the outputs
-            outputs().resize(1);
+            outputs().resize(2);
             outputs()[0] = Connection("out",Multiple,Any);
+            outputs()[1] = Connection("Trace",Multiple,String);
         }
         /*!
          * \brief process
@@ -45,9 +46,14 @@ namespace NODEFLOW
          */
         bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
         {
-            // log the data
-            std::cerr << "Node Id:"   << nodeId << " InputId:" << id << " Value:" << data << std::endl;
-            return post(ns,nodeId,Output,data);
+            // log the data to standard error
+            std::ostringstream os;
+            os << "Node Id:" << nodeId  << " InputId:" << id << " Value:" << data;
+            VALUE tv;
+            setValueData(std::string("Trace"),os.str(),tv);
+            post(ns,nodeId,1,tv); // send the trace message out of the trace output as a string - the node set out queue
+
+            return post(ns,nodeId,Output,data); // just forward
         }
 
     };

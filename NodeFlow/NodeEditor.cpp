@@ -123,8 +123,12 @@ NodeEditorPanelBase::NodeEditorPanelBase(wxWindow* parent, wxWindowID id, const 
     m_toolbar173->AddTool(wxID_CLEAR, _("Tool Label"), wxArtProvider::GetBitmap(wxART_NEW, wxART_TOOLBAR, wxDefaultSize), wxNullBitmap, wxITEM_NORMAL, _("Clear"), wxT(""), NULL);
     
     m_toggleEdit = new wxToggleButton(m_toolbar173, wxID_ANY, _("Edit/Run"), wxDefaultPosition, wxDLG_UNIT(m_toolbar173, wxSize(-1,-1)), 0);
-    m_toggleEdit->SetValue(true);
+    m_toggleEdit->SetValue(false);
     m_toolbar173->AddControl(m_toggleEdit);
+    
+    m_buttonStart = new wxButton(m_toolbar173, wxID_ANY, _("Start"), wxDefaultPosition, wxDLG_UNIT(m_toolbar173, wxSize(-1,-1)), 0);
+    m_buttonStart->Enable(false);
+    m_toolbar173->AddControl(m_buttonStart);
     
     m_buttonStep = new wxButton(m_toolbar173, wxID_ANY, _("Step"), wxDefaultPosition, wxDLG_UNIT(m_toolbar173, wxSize(-1,-1)), 0);
     m_buttonStep->Enable(false);
@@ -163,6 +167,7 @@ NodeEditorPanelBase::NodeEditorPanelBase(wxWindow* parent, wxWindowID id, const 
     this->Connect(wxID_SAVEAS, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onSaveAs), NULL, this);
     this->Connect(wxID_CLEAR, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onClear), NULL, this);
     m_toggleEdit->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onEditRun), NULL, this);
+    m_buttonStart->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onStartSet), NULL, this);
     m_buttonStep->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onStep), NULL, this);
     m_buttonTrigger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onTrigger), NULL, this);
     m_buttonRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onRun), NULL, this);
@@ -179,6 +184,7 @@ NodeEditorPanelBase::~NodeEditorPanelBase()
     this->Disconnect(wxID_SAVEAS, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onSaveAs), NULL, this);
     this->Disconnect(wxID_CLEAR, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onClear), NULL, this);
     m_toggleEdit->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onEditRun), NULL, this);
+    m_buttonStart->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onStartSet), NULL, this);
     m_buttonStep->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onStep), NULL, this);
     m_buttonTrigger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onTrigger), NULL, this);
     m_buttonRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NodeEditorPanelBase::onRun), NULL, this);

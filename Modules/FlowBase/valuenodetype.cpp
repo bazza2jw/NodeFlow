@@ -68,7 +68,7 @@ public:
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         ValueNodeType<bool,NODEFLOW::Bool>::load(dlg,ns,p);
-        dlg.loader().addStringProperty("Value","Value",ns.data().getValue<std::string>(p,"Value"));
+        dlg.loader().addBoolProperty("Value","Value",ns.data().getValue<bool>(p,"Value"));
     }
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
@@ -82,7 +82,48 @@ public:
  */
 class TimerNodeType  :  public NODEFLOW::NodeType
 {
-    wxStopWatch _timer;
+    class TimerNode : public NODEFLOW::Node
+    {
+        wxStopWatch _timer; // timer for node
+        int _interval = 1000;
+    public:
+        /*!
+         * \brief TimerNode
+         * \param id
+         * \param type
+         */
+        TimerNode(unsigned id = 0, size_t type = 0) : NODEFLOW::Node(id,type)
+        {
+
+        }
+        /*!
+        * \brief load
+        * \param s
+        */
+        void load(NODEFLOW::NodeSet &ns)
+        {
+            MRL::PropertyPath p;
+            toPath(p);
+            NODEFLOW::Node::load(ns);
+            _interval = ns.data().getValue<int>(p,"Value");
+            _timer.Start();
+        }
+        /*!
+         * \brief ticked
+         * \return
+         */
+        bool ticked()
+        {
+            if(_timer.TimeInMicro()/1000 > _interval)
+            {
+                _timer.Start();
+                return true;
+            }
+            return false;
+        }
+
+    };
+
 public:
     /*!
      * \brief TimerNodeType
@@ -90,7 +131,6 @@ public:
      */
     TimerNodeType(const std::string &s) : NodeType(s)
     {
-        _timer.Start();
     }
 
     /*!
@@ -105,6 +145,44 @@ public:
     }
 
     /*!
+     * \brief start
+     * \param ns
+     * \param node
+     * \return
+     */
+    void  start(NODEFLOW::NodeSet &ns, NODEFLOW::NodePtr &node)
+    {
+        NODEFLOW::NodeType::start(ns,node);
+        TimerNode * n = static_cast<TimerNode *>(node.get());
+        if(n)
+        {
+            n->load(ns);
+        }
+    }
+
+    /*!
+     * \brief create
+     * \param i
+     * \return
+     */
+    virtual NODEFLOW::Node * create(unsigned i)
+    {
+        return new TimerNode(i,id());
+    }
+
+    /*!
+     * \brief step
+     * \param ns
+     * \param node
+     * \return
+     */
+    bool step(NODEFLOW::NodeSet &ns, NODEFLOW::NodePtr &node)
+    {
+        TimerNode * n = static_cast<TimerNode *>(node.get());
+        return n->ticked();
+    }
+
+    /*!
      * \brief trigger
      * \param ns
      * \param n
@@ -115,19 +193,9 @@ public:
         {
             if(n && n->enabled())
             {
-                MRL::PropertyPath p;
-                n->toPath(p);
-                int interval = ns.data().getValue<int>(p,"Value");
-                if(interval > 0) // get the value parameter
-                {
-                    if(_timer.TimeInMicro()/1000 > interval)
-                    {
-                        NODEFLOW::VALUE d;
-                        setValueData("Timer", true, d);
-                        post(ns,n->id(),0,d);
-                        _timer.Start();
-                    }
-                }
+                NODEFLOW::VALUE d;
+                setValueData(std::string("Timer"), true, d);
+                post(ns,n->id(),0,d);
             }
         }
         catch(...)
@@ -156,8 +224,8 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[2]->GetValue();
-        ns.data().setValue(p,"Value",v.GetInteger());
+        wxAny v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
+        ns.data().setValue(p,"Value",v.As<int>());
     }
 
 };
@@ -167,15 +235,15 @@ public:
  */
 void addValueNodes()
 {
-   NODEFLOW::NodeType::addType<TimerNodeType>("Timer");
-   NODEFLOW::NodeType::addType<BoolNodeType>("Bool");
-   NODEFLOW::NodeType::addType<StringNodeType>("String");
-   NODEFLOW::NodeType::addType<DoubleNodeType>("Double");
-   NODEFLOW::NodeType::addType<IntegerNodeType>("Integer");
-   //
-   NODEFLOW::NodeType::addType<NODEFLOW::GlobalBoolNodeType>("GlobalBool");
-   NODEFLOW::NodeType::addType<NODEFLOW::GlobalIntegerNodeType>("GlobalInteger");
-   NODEFLOW::NodeType::addType<NODEFLOW::GlobalFloatNodeType>("GlobalFloat");
-   NODEFLOW::NodeType::addType<NODEFLOW::GlobalStringNodeType>("GlobalString");
-   //
+    NODEFLOW::NodeType::addType<TimerNodeType>("Timer");
+    NODEFLOW::NodeType::addType<BoolNodeType>("Bool");
+    NODEFLOW::NodeType::addType<StringNodeType>("String");
+    NODEFLOW::NodeType::addType<DoubleNodeType>("Double");
+    NODEFLOW::NodeType::addType<IntegerNodeType>("Integer");
+    //
+    NODEFLOW::NodeType::addType<NODEFLOW::GlobalBoolNodeType>("GlobalBool");
+    NODEFLOW::NodeType::addType<NODEFLOW::GlobalIntegerNodeType>("GlobalInteger");
+    NODEFLOW::NodeType::addType<NODEFLOW::GlobalFloatNodeType>("GlobalFloat");
+    NODEFLOW::NodeType::addType<NODEFLOW::GlobalStringNodeType>("GlobalString");
+    //
 }

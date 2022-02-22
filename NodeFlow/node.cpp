@@ -44,8 +44,10 @@ void NODEFLOW::Node::load(NodeSet &s)
     toPath(p); // location of node data
     _location.x = t.getValue<int>(p,"X");
     _location.y = t.getValue<int>(p,"Y");
-    _colour = wxUint32(t.getValue<unsigned>(p,"Colour"));
-    _enabled= t.getValue<bool>(p,"Enabled");
+    std::string cs = t.getValue<std::string>(p,"Colour"); // configured colour
+    wxColour c(cs);
+    _colour = c;
+    _enabled= t.getValue<bool>(p,"Enabled"); // configured enabled state
 }
 /*!
  * \brief NODEFLOW::Node::save
@@ -64,7 +66,6 @@ void NODEFLOW::Node::save(NodeSet &s)
         t.setValue(p,"Typename",nt->name());
         t.setValue(p,"X",_location.x);
         t.setValue(p,"Y",_location.y);
-        t.setValue(p,"Colour",unsigned(_colour.GetRGB()));
         t.setValue(p,"Enabled",_enabled);
     }
 }

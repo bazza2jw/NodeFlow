@@ -30,8 +30,6 @@ public:
         Output = 0
     };
 
-    bool _haveA = false;
-    bool _haveB = false;
     BINARY_OPFUNC _op;
     ConnectionType _inType = inType;
 
@@ -42,7 +40,9 @@ public:
     {
 
     }
-    virtual const char * nodeClass() const { return "Math Operators";}
+    virtual const char * nodeClass() const {
+        return "Math Operators";
+    }
     /*!
      * \brief setupConnections
      */
@@ -63,14 +63,14 @@ public:
      */
     virtual void start(NodeSet &ns,  NodePtr &n)
     {
-        _haveA = false;
+        NodeType::start(ns,n);
         n->data()["A"] = T(0);
         n->data()["OUT"] = T(0);
         MRL::PropertyPath p;
         n->toPath(p);
-        _haveB = ns.data().getValue<bool>(p,"UseDefautB");
-        n->data()["B"] =  ns.data().getValue<T>(p,"DefautB");;
-
+        n->data()["HaveA"] = false;
+        n->data()["HaveB"] = ns.data().getValue<bool>(p,"UseDefaultB");
+        n->data()["B"] =  ns.data().getValue<T>(p,"DefaultB");
     }
 
     /*!
@@ -84,28 +84,34 @@ public:
     virtual bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
     {
         NodePtr &n = ns.findNode(nodeId);
+
         if(n && n->enabled())
         {
+            bool haveA = n->data()["HaveA"].asBool();
+            bool haveB = n->data()["HaveB"].asBool();
             switch(id)
             {
             case InputA:
                 n->data()["A"] = data[DATA_PAYLOAD].as<T>();
-                _haveA = true;
+                haveA = true;
+                n->data()["HaveA"] = haveA;
                 break;
             case InputB:
                 n->data()["B"] = data[DATA_PAYLOAD].as<T>();
-                _haveB = true;
+                haveB = true;
+                n->data()["HaveB"] = haveB;
                 break;
             default:
                 break;
             }
-        }
-        if(_haveA && _haveB)
-        {
-            R r = op(n->data()["A"].as<T>(), n->data()["B"].as<T>());
-            VALUE result;
-            setValueData(data[DATA_TOPIC].asString(),r,result);
-            return post(ns,nodeId,Output,result);
+
+            if(haveA && haveB)
+            {
+                R r = op(n->data()["A"].as<T>(), n->data()["B"].as<T>());
+                VALUE result;
+                setValueData(data,r,result);
+                return post(ns,nodeId,Output,result);
+            }
         }
         return false;
     }
@@ -206,8 +212,6 @@ public:
         FalseOutput = 2
     };
 
-    bool _haveA = false;
-    bool _haveB = false;
     BINARY_REL_OPFUNC _op;
     ConnectionType _inType = inType;
 
@@ -222,7 +226,9 @@ public:
     {
 
     }
-    virtual const char * nodeClass() const { return "Relation Operators";}
+    virtual const char * nodeClass() const {
+        return "Relation Operators";
+    }
     /*!
      * \brief setupConnections
      */
@@ -245,13 +251,13 @@ public:
      */
     virtual void start(NodeSet &ns,  NodePtr &n)
     {
-        _haveA = false;
         n->data()["A"] = T(0);
         n->data()["OUT"] = T(0);
         MRL::PropertyPath p;
         n->toPath(p);
-        _haveB = ns.data().getValue<bool>(p,"UseDefautB");
-        n->data()["B"] =  ns.data().getValue<T>(p,"DefautB");;
+        n->data()["HaveA"] = false;
+        n->data()["HaveB"] = ns.data().getValue<bool>(p,"UseDefaultB");
+        n->data()["B"] =  ns.data().getValue<T>(p,"DefaultB");;
 
     }
 
@@ -268,27 +274,32 @@ public:
         NodePtr &n = ns.findNode(nodeId);
         if(n && n->enabled())
         {
+            bool haveA = n->data()["HaveA"].asBool();
+            bool haveB = n->data()["HaveB"].asBool();
             switch(id)
             {
             case InputA:
                 n->data()["A"] = data[DATA_PAYLOAD].as<T>();
-                _haveA = true;
+                haveA = true;
+                n->data()["HaveA"] = haveA;
                 break;
             case InputB:
                 n->data()["B"] = data[DATA_PAYLOAD].as<T>();
-                _haveB = true;
+                haveB = true;
+                n->data()["HaveB"] = haveB;
                 break;
             default:
                 break;
             }
-        }
-        if(_haveA && _haveB)
-        {
-            bool r = op(n->data()["A"].as<T>(), n->data()["B"].as<T>());
-            VALUE result;
-            setValueData(data[DATA_TOPIC].asString(),r,result);
-            post(ns,nodeId,r?TrueOutput:FalseOutput,data); // route the packet
-            return post(ns,nodeId,Output,result);
+            //
+            if(haveA && haveB)
+            {
+                bool r = op(n->data()["A"].as<T>(), n->data()["B"].as<T>());
+                VALUE result;
+                setValueData(data,r,result);
+                post(ns,nodeId,r?TrueOutput:FalseOutput,data); // route the packet
+                return post(ns,nodeId,Output,result); // output the logical result
+            }
         }
         return false;
     }
@@ -400,7 +411,9 @@ public:
     {
 
     }
-    virtual const char * nodeClass() const { return "Unary Operators";}
+    virtual const char * nodeClass() const {
+        return "Unary Operators";
+    }
     /*!
      * \brief setupConnections
      */
@@ -445,7 +458,7 @@ public:
                 R r = op(data[DATA_PAYLOAD].as<T>());
                 n->data()["OUT"] = r;
                 VALUE result;
-                setValueData(data[DATA_TOPIC].asString(),r,result);
+                setValueData(data,r,result);
                 return post(ns,nodeId,Output,result);
             }
             default:
@@ -526,7 +539,9 @@ public:
      * \brief nodeClass
      * \return
      */
-    virtual const char * nodeClass() const { return "Topic Changers";}
+    virtual const char * nodeClass() const {
+        return "Topic Changers";
+    }
     /*!
      * \brief setupConnections
      */
@@ -632,7 +647,9 @@ public:
     {
 
     }
-    virtual const char * nodeClass() const { return "Topic";}
+    virtual const char * nodeClass() const {
+        return "Topic";
+    }
     /*!
      * \brief setupConnections
      */
@@ -691,7 +708,7 @@ public:
  */
 class FunctionTypeNode : public NodeType
 {
- protected:
+protected:
     class ParserWithConsts: public FunctionParser
     {
     public:
@@ -701,35 +718,39 @@ class FunctionTypeNode : public NodeType
             AddConstant("e", 2.71828182845904523536);
         }
     };
-    ParserWithConsts _parser;
-    std::vector<double> _vars;
-    MRL::VariantPropertyTree _config;
+    class FunctionNode : public Node
+    {
+        ParserWithConsts _parser;
+    public:
+        FunctionNode(unsigned id, unsigned type) : Node(id,type) {}
+        virtual bool compile(const std::string &func, const std::string &args = "a")
+        {
+            return _parser.Parse(func,args) == -1;
+        }
+
+        FunctionParser & parser() {
+            return  _parser;
+        }
+
+    };
 
 public:
     FunctionTypeNode(const std::string &s) : NodeType(s)
     {
 
     }
+
+    virtual NODEFLOW::Node * create(unsigned i)
+    {
+        return new FunctionNode(i,id());
+    }
+
     /*!
      * \brief nodeClass
      * \return
      */
-    virtual const char * nodeClass() const { return "Function";}
-
-    /*!
-     * \brief compile
-     * \param func
-     * \param args
-     * \return
-     */
-    virtual bool compile(const std::string &func, const std::string &args = "a")
-    {
-        _vars.resize(1);
-        return _parser.Parse(func,args) == -1;
-    }
-
-    FunctionParser & parser() {
-        return  _parser;
+    virtual const char * nodeClass() const {
+        return "Function";
     }
 
     /*!
@@ -737,10 +758,18 @@ public:
      */
     virtual void start(NodeSet &ns,  NodePtr &node)
     {
-        MRL::PropertyPath p;
-        node->toPath(p);
-        std::string f = ns.data().getValue<std::string>(p,"Function");
-        compile(f,"a"); // variable a is the input
+        try
+        {
+            if(node)
+            {
+                MRL::PropertyPath p;
+                node->toPath(p);
+                std::string f = ns.data().getValue<std::string>(p,"Function");
+                FunctionNode *n = static_cast<FunctionNode *>(node.get());
+                n->compile(f,"a"); // variable a is the input
+            }
+        }
+        CATCH_DEF
     }
 
     /*!
@@ -761,10 +790,11 @@ public:
             case 0:
             {
                 double vars = data[DATA_PAYLOAD].asDouble();
-                double  r = _parser.Eval(&vars);
+                FunctionNode *fn = static_cast<FunctionNode *>(n.get());
+                double  r = fn->parser().Eval(&vars);
                 n->data()["OUT"] = r;
                 VALUE result;
-                setValueData(data[DATA_TOPIC].asString(),r,result);
+                setValueData(data,r,result);
                 return post(ns,nodeId,Output,result);
             }
             default:
@@ -796,7 +826,7 @@ public:
      * \param ns
      * \param p
      */
-    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath &p)
+    virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::load(dlg,ns,p);
         //
@@ -809,13 +839,12 @@ public:
      * \param ns
      * \param p
      */
-    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath &p)
+    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::save(dlg,ns,p);
         wxVariant fv = dlg.loader().fields()[PropField1]->GetValue();
         std::string f = fv.GetString().ToStdString();
         ns.data().setValue(p,"Function",f);
-        ns.data().dump();
     }
 
 

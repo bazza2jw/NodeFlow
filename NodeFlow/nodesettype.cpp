@@ -59,7 +59,7 @@ bool NODEFLOW::NodeSetType::properties(wxWindow * parent, NodeSet &ns, unsigned 
 void NODEFLOW::NodeSetType::load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
 {
     NODEFLOW::NodeType::load(dlg,ns,p);
-    dlg.loader().addStringProperty("Node Set","NodeSet",ns.data().getValue<std::string>(p,"NodeSet")); // field[2]
+    dlg.loader().addStringProperty("Node Set","NodeSet",ns.data().getValue<std::string>(p,"NodeSet"));
 }
 
 /*!
@@ -71,7 +71,7 @@ void NODEFLOW::NodeSetType::load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::Pr
 void NODEFLOW::NodeSetType::save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
 {
     NODEFLOW::NodeType::save(dlg,ns,p);
-    wxVariant v = dlg.loader().fields()[3]->GetValue();
+    wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
     ns.data().setValue(p,"NodeSet",v.GetString().ToStdString());
 }
 

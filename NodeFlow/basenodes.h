@@ -59,7 +59,7 @@ public:
     {
         VALUE v(_value++); // generate an auto incrementing value
         VALUE d;
-         setValueData("BASEINPUT", v, d);
+         setValueData(std::string("BASEINPUT"), v, d);
         post(ns,node->id(), BaseNodeType::BaseOutputId,d);
     }
 
@@ -75,7 +75,7 @@ public:
     bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
     {
         // log the data
-        std::cerr << "Node Id:"   << nodeId << " InputId:" << id << " Value:" << data << std::endl;
+        std::cerr << "OUTPUT Node Id:"   << nodeId << " InputId:" << id << " Value:" << data << std::endl;
         return true;
     }
 };

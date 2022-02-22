@@ -604,7 +604,10 @@ void CanvasWindows::onPopupClick(wxCommandEvent &evt)
         // Open properties for the node
         if(_currentNode)
         {
+            _currentNode->save(_nodes); // save curent location
             _currentNode->nodeType()->properties(this,_nodes,_currentNode->id());
+            _currentNode->load(_nodes); // load any changed attiributes
+            Refresh();
         }
 
         break;

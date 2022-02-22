@@ -38,9 +38,9 @@ namespace NODEFLOW
             {
                 MRL::PropertyPath p;
                 n->toPath(p);
-                T v = ns.data().getValue<T>("Value");
+                T v = ns.data().getValue<T>(p,"Value");
                 VALUE result;
-                setValueData(data[DATA_TOPIC].asString(),0,result);
+                setValueData(data,v,result);
                 return post(ns,nodeId,Output,result);
             }
             return false;
@@ -95,9 +95,8 @@ namespace NODEFLOW
                 MRL::PropertyPath p;
                 p.push_back("GLOBAL");
                 T v = data[DATA_PAYLOAD].as<T>();
-                ns.data().setValue(p,n->data()["GLOBALNAME"].asString(),v); // set the global value
-                VALUE result = data;
-                return post(ns,nodeId,Output,result);
+                ns.data().setValue(p,n->data()["GLOBALNAME"].asString(),v); // set the global value in the data tree
+                return post(ns,nodeId,Output,data);
             }
             return false;
         }
@@ -130,7 +129,7 @@ namespace NODEFLOW
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             NodeType::save(dlg,ns,p);
-            wxVariant v = dlg.loader().fields()[2]->GetValue();
+            wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
             ns.data().setValue(p,"GlobalName",v.GetString().ToStdString());
         }
 

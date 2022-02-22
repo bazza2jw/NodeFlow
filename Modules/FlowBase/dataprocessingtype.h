@@ -79,7 +79,7 @@ namespace NODEFLOW
                     n->data()["IN"] = v;
                     v = n->data()["SCALE"].asDouble() * v +  n->data()["OFFSET"].asDouble();
                     VALUE result;
-                    setValueData(data[DATA_TOPIC].asString(),v,result);
+                    setValueData(data,v,result);
                     return post(ns,nodeId,Output,result);
 
                 }
@@ -147,7 +147,7 @@ namespace NODEFLOW
 
     /*!
      * \brief The ThresholdTypeNode class
-     * HiHi LoLo HiLo LoHi
+     * Hi Lo
      */
     class WindowThresholdTypeNode : public NodeType // two inputs one output
     {
@@ -222,25 +222,25 @@ namespace NODEFLOW
                     int state = 0;
                     if(v > n->data()["HILIMIT"].asDouble())
                     {
-                        setValueData(data[DATA_TOPIC].asString(),true,result);
+                        setValueData(data,true,result);
                         post(ns,nodeId,HiOutput,result);
                         state = 3;
 
                     }
                     else if(v < n->data()["LOLIMIT"].asDouble())
                     {
-                        setValueData(data[DATA_TOPIC].asString(),true,result);
+                        setValueData(data,true,result);
                         post(ns,nodeId,LoOutput,result);
                         state = 2;
 
                     }
                     else
                     {
-                        setValueData(data[DATA_TOPIC].asString(),true,result);
+                        setValueData(data,true,result);
                         post(ns,nodeId,OkOutput,result);
                         state = 1;
                     }
-                    setValueData(data[DATA_TOPIC].asString(),state,result);
+                    setValueData(data,state,result);
                     post(ns,nodeId,StateOutput,result);
 
                 }

@@ -47,7 +47,7 @@ public:
         outputs().resize(1);
         outputs()[0] = Connection("out",Multiple,Any);
     }
-
+    bool step(NodeSet &,NodePtr &) { return true;}
     void trigger(NodeSet &ns, NodePtr &node )
     {
         post(ns,node->id(), 0,ns.inValue());

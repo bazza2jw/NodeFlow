@@ -22,6 +22,7 @@ public:
     virtual void onStop(wxCommandEvent& event);
     virtual void onDragInit(wxTreeEvent& event);
 protected:
+    virtual void onStartSet(wxCommandEvent& event);
     virtual void onInject(wxCommandEvent& event);
     virtual void onTimer(wxTimerEvent& event);
     virtual void onEditRun(wxCommandEvent& event);

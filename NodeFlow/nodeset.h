@@ -127,26 +127,30 @@ public:
      template<typename T>
     unsigned addNode(T s, int x = 0, int y = 0, unsigned id = 0)
     {
-
-        NodeType *t = NodeType::find(s);
-        if(t)
+        try
         {
-            if(id == 0) id = _nodeId++;
-            Node * n =  t->createNode(id);
-            if(n)
+            NodeType *t = NodeType::find(s);
+            if(t)
             {
-                _nodes[id] = std::move(std::unique_ptr<Node>(n));
-                MRL::PropertyPath p;
-                p.push_back("Nodes");
-                p.push_back(n->sid());
-                data().setValue("Id",id);
-                n->setLocation(x,y);
-                data().setValue("X",x);
-                data().setValue("Y",y);
-                data().setString("Name","Name");
-                n->save(*this);
+                if(id == 0) id = _nodeId++;
+                Node * n =  t->createNode(id);
+                if(n)
+                {
+                    _nodes[id] = std::move(std::unique_ptr<Node>(n));
+                    MRL::PropertyPath p;
+                    p.push_back("Nodes");
+                    p.push_back(n->sid());
+                    data().setValue(p,"Id",id);
+                    n->setLocation(x,y);
+                    data().setValue(p,"X",x);
+                    data().setValue(p,"Y",y);
+                    std::string sn = "ID" + std::to_string(id);
+                    data().setValue(p,"Name",sn);
+                    n->save(*this);
+                }
             }
         }
+        CATCH_DEF
         return 0;
     }
 

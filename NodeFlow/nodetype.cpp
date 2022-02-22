@@ -26,35 +26,39 @@ const char * NODEFLOW::NodeType::props[NODEFLOW::NumberConnectionType] =
  */
 bool NODEFLOW::NodeType::calculate(NodeSet &ns, unsigned nodeId, unsigned id, VALUE &data )
 {
-    // evaluate each of the outputs attached to this input
-    NodePtr  &n = ns.findNode(nodeId);
-    VALUE r;
-    if(n)
+    try
     {
-        ItemListPtr &il = n->inputs()[id];
-        if(il)
+        // evaluate each of the outputs attached to this input
+        NodePtr  &n = ns.findNode(nodeId);
+        VALUE r;
+        if(n)
         {
-            for(auto i = il->begin(); i != il->end(); i++)
+            ItemListPtr &il = n->inputs()[id];
+            if(il)
             {
-                EdgePtr &e = ns.findEdge(*i);
-                if(e)
+                for(auto i = il->begin(); i != il->end(); i++)
                 {
-                    VALUE d;
-                    NodePtr &src = ns.findNode(e->from().node());
-                    if(src)
+                    EdgePtr &e = ns.findEdge(*i);
+                    if(e)
                     {
-                        NodeType *t = src->nodeType();
-                        if(t->evaluate(ns,e->from().node(),e->from().id(),d))
+                        VALUE d;
+                        NodePtr &src = ns.findNode(e->from().node());
+                        if(src)
                         {
-                            // we have one value from one output connected to the input
-                            processEvaluatedData(ns,n,id,d,r);
+                            NodeType *t = src->nodeType();
+                            if(t->evaluate(ns,e->from().node(),e->from().id(),d))
+                            {
+                                // we have one value from one output connected to the input
+                                processEvaluatedData(ns,n,id,d,r);
+                            }
                         }
                     }
                 }
             }
+            data = r;
         }
-        data = r;
     }
+    CATCH_DEF
     return false;
 }
 
@@ -71,16 +75,20 @@ bool NODEFLOW::NodeType::calculate(NodeSet &ns, unsigned nodeId, unsigned id, VA
  */
 bool NODEFLOW::NodeType::evaluate(NodeSet &ns, unsigned nodeId, unsigned id,  VALUE &data )
 {
-    // for the given output evaluate the inputs for the output
-    NodePtr  &n = ns.findNode(nodeId);
-    if(n)
+    try
     {
-        if(n->calculatedData().find(id) != n->calculatedData().end())
+        // for the given output evaluate the inputs for the output
+        NodePtr  &n = ns.findNode(nodeId);
+        if(n)
         {
-            data = n->calculatedData().at(id); // cached value
-            return true;
+            if(n->calculatedData().find(id) != n->calculatedData().end())
+            {
+                data = n->calculatedData().at(id); // cached value
+                return true;
+            }
         }
     }
+    CATCH_DEF
     return false;
 }
 
@@ -88,6 +96,7 @@ bool NODEFLOW::NodeType::evaluate(NodeSet &ns, unsigned nodeId, unsigned id,  VA
  * \brief process
  * \param nodeId this node to process the signal
  * \param id this is the input index
+ * \param data thhe data packet - note the const is important - if the packet mutates copy and modify the copy and post on the copy
  * \return true on success
  */
 bool NODEFLOW::NodeType::process(NodeSet &/*ns*/, unsigned /*nodeId*/, unsigned /*id*/, const VALUE &/*data*/)
@@ -102,30 +111,39 @@ bool NODEFLOW::NodeType::process(NodeSet &/*ns*/, unsigned /*nodeId*/, unsigned 
  */
 bool NODEFLOW::NodeType::post(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data )
 {
-    NodePtr &n = ns.findNode(nodeId);
-    if(n)
+    bool ret = false;
+    try
     {
-        // get the list of edges attached to the output
-        ItemListPtr &il = n->outputs()[id];
-        for(auto i = il->begin(); i != il->end(); i++)
+        NodePtr &n = ns.findNode(nodeId);
+        if(n)
         {
-            EdgePtr &e = ns.findEdge(*i);
-            if(e)
+            // get the list of edges attached to the output
+            ItemListPtr &il = n->outputs()[id];
+            if(il->size() > 0) // connected to anything ?
             {
-                NodePtr &dn = ns.findNode(e->to().node());
-                if(dn)
+                for(auto i = il->begin(); i != il->end(); i++)
                 {
-                    NodeType *t = NodeType::find(dn->type()); // get the destination type
-                    if(t)
+                    EdgePtr &e = ns.findEdge(*i);
+                    if(e)
                     {
-                        // process each connection
-                        return t->process(ns,dn->id(),e->to().id(),data);
+                        NodePtr &dn = ns.findNode(e->to().node());
+                        if(dn)
+                        {
+                            NodeType *t = NodeType::find(dn->type()); // get the destination type
+                            if(t)
+                            {
+                                // process each connection
+                                ret |= t->process(ns,dn->id(),e->to().id(),data);
+                            }
+                        }
                     }
                 }
             }
         }
     }
-    return false;
+    CATCH_DEF
+
+    return ret;
 }
 
 /*!
@@ -181,18 +199,22 @@ void NODEFLOW::NodeType::setup()
  */
 bool NODEFLOW::NodeType::properties(wxWindow *parent, NodeSet &ns, unsigned nodeId)
 {
-    // property page
-    MRL::PropertyPath p;
-    NodePtr &n = ns.findNode(nodeId);
-    n->toPath(p);
-    PropertiesEditorDialog dlg(parent,ns.data(),p);
-    //
-    load(dlg,ns,p);
-    if(dlg.ShowModal() == wxID_OK)
+    try
     {
-        save(dlg,ns,p);
-        return true;
+        // property page
+        MRL::PropertyPath p;
+        NodePtr &n = ns.findNode(nodeId);
+        n->toPath(p);
+        PropertiesEditorDialog dlg(parent,ns.data(),p);
+        //
+        load(dlg,ns,p);
+        if(dlg.ShowModal() == wxID_OK)
+        {
+            save(dlg,ns,p);
+            return true;
+        }
     }
+    CATCH_DEF
     return false;
 }
 /*!
@@ -205,7 +227,9 @@ void NODEFLOW::NodeType::load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::Prope
 {
     dlg.loader().addStringProperty("Name","Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
     dlg.loader().addBoolProperty("Enable Node","Enable",ns.data().getValue<bool>(p,"Enabled")); // field[1]
-    dlg.loader().addColourProperty("Node Colour","Colour",ns.data().getValue<unsigned>(p,"Colour")); // field[2]
+    wxString cs(ns.data().getValue<std::string>(p,"Colour"));
+    wxColour c(cs);
+    dlg.loader().addColourProperty("Node Colour","Colour",c); // field[2]
 
 }
 /*!
@@ -220,8 +244,9 @@ void NODEFLOW::NodeType::save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::Prope
     ns.data().setValue(p,"Name",v.GetString().ToStdString());
     v = dlg.loader().fields()[1]->GetValue();
     ns.data().setValue(p,"Enabled",v.GetBool());
-    wxAny a = dlg.loader().fields()[2]->GetValue();
-    ns.data().setValue(p,"Colour", a.As<wxColour>());
+    wxColourProperty *c = static_cast<wxColourProperty *>(dlg.loader().fields()[2]);
+    wxString s = "rgb" + c->GetValueAsString();
+    ns.data().setValue(p,"Colour", s.ToStdString());
 
 }
 
