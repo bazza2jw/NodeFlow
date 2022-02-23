@@ -625,6 +625,78 @@ public:
 };
 
 /*!
+ * \brief The RbeTypeNode class
+ * Report by exception
+ */
+class RbeTypeNode : public NodeType // two inputs one output
+{
+public:
+    enum
+    {
+        InputA = 0,
+        Output = 0
+    };
+
+public:
+    /*!
+     * \brief TopicChangeTypeNode
+     * \param s
+     */
+    RbeTypeNode(const std::string s) : NodeType(s)  {    }
+    /*!
+     * \brief nodeClass
+     * \return
+     */
+    virtual const char * nodeClass() const { return "Unary Operators"; }
+
+    /*!
+     * \brief setupConnections
+     */
+    void setupConnections()
+    {
+        inputs().resize(1);
+        inputs()[0] = Connection("in",Multiple,Any);
+        //
+        // set up the outputs
+        outputs().resize(1);
+        outputs()[0] = Connection("out",Multiple,Any);
+    }
+
+
+    /*!
+     * \brief process
+     * \param ns
+     * \param nodeId
+     * \param id
+     * \param data
+     * \return true on success
+     */
+    virtual bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
+    {
+        NodePtr &n = ns.findNode(nodeId);
+        if(n && n->enabled())
+        {
+            switch(id)
+            {
+            case InputA:
+            {
+                if(data[DATA_PAYLOAD] != n->data()[DATA_PAYLOAD])
+                {
+                    n->data() = data;
+                    return post(ns,nodeId,Output,data);
+                }
+            }
+            default:
+                break;
+            }
+        }
+        return false;
+    }
+};
+
+
+
+/*!
  * \brief The TopicFilterTypeNode class
  * Routes a packet based on the topic to either the match or reject outputs
  */

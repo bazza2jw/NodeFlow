@@ -1,7 +1,7 @@
 #include "nodeflowplugin.h"
 #include <MrlLib/mrllib.h>
 /*
- * Copyright (C) 2018 -  B. J. Hill
+ * Copyright (C) 2022 -  B. J. Hill
  *
  * This file is part of OpcServant. OpcServant C++ classes are free software: you can
  * redistribute it and/or modify it under the terms of the Mozilla Public
