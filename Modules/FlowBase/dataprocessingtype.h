@@ -51,7 +51,7 @@ namespace NODEFLOW
                 {
                     MRL::PropertyPath p;
                     node->toPath(p);
-                    int w = ns.data().getValue<int>(p,"Size");
+                    int w = ns.data().getValue<int>(p,"Width");
                     StatsNode *n = static_cast<StatsNode *>(node.get());
                     n->stats().clear();
                     n->stats().setWidth((w > 2)?w:5);
@@ -80,11 +80,11 @@ namespace NODEFLOW
                     StatsNode *sn = static_cast<StatsNode *>(n.get());
                     double v = data[DATA_PAYLOAD].asDouble();
                     sn->stats().addValue(v);
+                    post(ns,nodeId,Output,data); // post on unchanged
                     if(sn->stats().size() > 2) // need more than two values to get a mean and sd
                     {
                         sn->stats().evaluate();
                         VALUE result;
-                        post(ns,nodeId,Output,data); // post on unchanged
                         //
                         double a = sn->stats().statistics().getMean();
                         setValueData(data,a,result);
@@ -121,7 +121,7 @@ namespace NODEFLOW
             inputs()[0] = Connection("in",Single,Float);
             //
             // set up the outputs
-            outputs().resize(4);
+            outputs().resize(5);
             outputs()[0] = Connection("out",Multiple,Float); // pass through
             outputs()[1] = Connection("Mean",Multiple,Float);
             outputs()[2] = Connection("SD",Multiple,Float);
@@ -150,7 +150,7 @@ namespace NODEFLOW
         {
             NodeType::save(dlg,ns,p);
             wxVariant fv = dlg.loader().fields()[PropField1]->GetValue();
-            ns.data().setValue(p,"Width",fv.GetInteger());
+            ns.data().setValue(p,"Width",int(fv.GetInteger()));
         }
 
 

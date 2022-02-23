@@ -13,6 +13,7 @@
 #include "valuenodetype.h"
 #include "NodeFlow/nodeset.h"
 #include "NodeFlow/PropertiesEditorDialog.h"
+#include <cstdlib>
 /*!
  * \brief The IntegerNodeType class
  */
@@ -51,6 +52,47 @@ public:
         ns.data().setValue(p,"Value",v.GetDouble());
     }
 };
+
+/*!
+ * \brief The DoubleNodeType class
+ */
+class RandomNodeType  :   public  NODEFLOW::ValueNodeType<double,NODEFLOW::Float>
+{
+public:
+    RandomNodeType(const std::string &s) : NODEFLOW::ValueNodeType<double,NODEFLOW::Float>(s) {}
+
+    virtual bool process(NODEFLOW::NodeSet &ns, unsigned nodeId, unsigned /*id*/, const NODEFLOW::VALUE &data)
+    {
+        NODEFLOW::NodePtr &n = ns.findNode(nodeId);
+        if(n && n->enabled())
+        {
+            MRL::PropertyPath p;
+            n->toPath(p);
+            int v = ns.data().getValue<int>(p,"Value");
+            int r = std::rand();
+            if(v > 1) r = r % v;
+            NODEFLOW::VALUE result;
+            setValueData(data,double(r),result);
+            return post(ns,nodeId,0,result);
+        }
+        return false;
+    }
+
+
+    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        ValueNodeType<double,NODEFLOW::Float>::load(dlg,ns,p);
+        dlg.loader().addUIntProperty("Value","Value",ns.data().getValue<int>(p,"Value"));
+    }
+    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        ValueNodeType<double,NODEFLOW::Float>::save(dlg,ns,p);
+        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
+        ns.data().setValue(p,"Value",int(v.GetInteger()));
+    }
+};
+
+
 /*!
  * \brief The StringNodeType class
  */
@@ -252,6 +294,7 @@ void addValueNodes()
     NODEFLOW::NodeType::addType<StringNodeType>("String");
     NODEFLOW::NodeType::addType<DoubleNodeType>("Double");
     NODEFLOW::NodeType::addType<IntegerNodeType>("Integer");
+    NODEFLOW::NodeType::addType<RandomNodeType>("Random");
     //
     NODEFLOW::NodeType::addType<NODEFLOW::GlobalBoolNodeType>("GlobalBool");
     NODEFLOW::NodeType::addType<NODEFLOW::GlobalIntegerNodeType>("GlobalInteger");
