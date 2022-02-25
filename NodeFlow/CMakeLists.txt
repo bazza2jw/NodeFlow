@@ -26,7 +26,7 @@ file (GLOB SourceFiles *.cpp)
 
 add_library(${MODULE} SHARED ${SourceFiles} )
 
-target_link_libraries(${MODULE} ${wxWidgets_LIBRARIES}  ${Boost_LIBRARIES} ${EXTRA_LIB_FLAGS} ${PROJECT_LIB_FLAGS})
+target_link_libraries(${MODULE} ${wxWidgets_LIBRARIES}  ${Boost_LIBRARIES} ${EXTRA_LIB_FLAGS} ${PROJECT_LIB_FLAGS} ${WTLIBS})
 
 install(TARGETS ${MODULE} DESTINATION lib)
 

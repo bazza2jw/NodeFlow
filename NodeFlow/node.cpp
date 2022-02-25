@@ -86,3 +86,33 @@ void NODEFLOW::Node::save(NodeSet &s)
         t.setValue(p,"Enabled",_enabled);
     }
 }
+
+
+void NODEFLOW::Node::getNodeEdges(EdgeIdSet &edgeDrawSet)
+{
+        // draw the connected edges
+        for(auto i = inputs().begin(); i != inputs().end(); i++)
+        {
+            NODEFLOW::ItemListPtr &il = *i;
+            if(il)
+            {
+                for(auto j = il->begin(); j != il->end(); j++)
+                {
+                    edgeDrawSet.insert(*j); // only draw edge once
+                }
+            }
+        }
+
+        for(auto i = outputs().begin(); i != outputs().end(); i++)
+        {
+            NODEFLOW::ItemListPtr &il = *i;
+            if(il)
+            {
+                for(auto j = il->begin(); j != il->end(); j++)
+                {
+                    edgeDrawSet.insert(*j);
+                }
+            }
+        }
+}
+

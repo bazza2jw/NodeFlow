@@ -21,6 +21,7 @@
 #include <wx/gdicmn.h>
 #include <MrlLib/mrllib.h>
 #include <MrlLib/variantpropertytree.h>
+#include "edge.h"
 
 namespace NODEFLOW
 {
@@ -171,6 +172,12 @@ public:
      * \param s
      */
     virtual void save(NodeSet &s);
+
+    /*!
+     * \brief getNodeEdges
+     * \param edgeDrawSet
+     */
+    void getNodeEdges(EdgeIdSet &edgeDrawSet);
 
 };
 

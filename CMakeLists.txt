@@ -16,6 +16,7 @@ project(NodeFlow)
 include (Common.cmake)
 add_subdirectory(NodeFlow)
 add_subdirectory(NodeEditor)
+add_subdirectory(NodeFlowWeb)
 add_subdirectory(Modules)
 #
 

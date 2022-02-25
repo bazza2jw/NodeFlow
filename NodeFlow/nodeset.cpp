@@ -12,6 +12,108 @@
 
 #include "nodeset.h"
 
+
+int NODEFLOW::NodeSet::hitTest(wxPoint &pt, HitStruct &hs)
+{
+    int ret = NONE;
+    clearSelected(); // clear all selections
+//
+    for(auto i = nodes().begin(); i != nodes().end(); i++)
+    {
+        NODEFLOW::NodePtr &n = i->second;
+        NODEFLOW::NodeType *t = NODEFLOW::NodeType::find(n->type());
+        wxRect r = t->nodeLayout(n->id()).rect(); // get bounding rect
+        r.SetPosition(n->location()); // translate
+        //
+        if(r.Contains(pt))
+        {
+            // Look for connection
+            hs._nodeId = n->id();
+            n->setSelected(true);
+            hs._node = n.get();
+            hs._currentRect = r;
+            hs._currentLayout = t->nodeLayout(n->id());
+
+            //
+            int h = hs._currentLayout.hitInputConnector(pt,n->location());
+            if(h >= 0)
+            {
+                if(t->canConnectInput(n,h))
+                {
+                    ret = INPUT_SELECT;
+                    hs._connectorSelect = h;
+                }
+            }
+            else
+            {
+                h = hs._currentLayout.hitOutputConnector(pt,n->location());
+                if(h >= 0)
+                {
+                    if(t->canConnectOutput(n,h))
+                    {
+                        ret = OUTPUT_SELECT;
+                        hs._connectorSelect = h;
+                    }
+                }
+            }
+            if( h < 0)
+            {
+                ret = NODE_SELECT;
+                hs._connectorSelect = -1;
+            }
+        }
+    }
+    return ret;
+}
+
+/*!
+ * \brief NODEFLOW::NodeSet::makeConnectionSelect
+ * \param pt
+ */
+void NODEFLOW::NodeSet::makeConnectionSelect(wxPoint &pt, wxPoint &startPoint, int state, NodeSet::HitStruct &start)
+{
+    NodeSet::HitStruct end;
+    int endState = hitTest(pt,end); // get where we are
+    if(endState != NODEFLOW::NodeSet::NONE)
+    {
+        switch(state)
+        {
+        case NODEFLOW::NodeSet::NODE_SELECT: // rectangle drag
+            //
+            if(start._node)
+            {
+                wxPoint p = pt - startPoint;
+                if((abs(p.x) > CONNECTION_SIZE ) && (abs(p.y)  > CONNECTION_SIZE  ))
+                {
+                    start._node->setLocation(pt);
+                }
+            }
+            break;
+        case NODEFLOW::NodeSet::INPUT_SELECT:
+        {
+            if(endState == NODEFLOW::NodeSet::OUTPUT_SELECT)
+            {
+                addConnect(end._nodeId,end._connectorSelect,start._nodeId,start._connectorSelect);
+            }
+        }
+        break;
+        case NODEFLOW::NodeSet::OUTPUT_SELECT:
+        {
+            if(endState == NODEFLOW::NodeSet::INPUT_SELECT)
+            {
+                addConnect(start._nodeId,start._connectorSelect,end._nodeId,end._connectorSelect);
+            }
+
+        }
+        break;
+        default:
+            break;
+        }
+    }
+
+}
+
+
 /*!
  * \brief NODEFLOW::NodeSet::addConnect
  * \param nodeFrom

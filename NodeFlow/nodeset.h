@@ -54,6 +54,37 @@ class NodeSet
     //
     VALUE _inValue; // value input to the set read by node set input nodes
     VALUEQUEUE _outValue; // written by node set output nodes
+    //
+
+public:
+    // for handling mouse clicks
+    enum
+    {
+        NONE = 0,
+        NODE_SELECT,
+        INPUT_SELECT,
+        OUTPUT_SELECT
+    };
+
+    struct HitStruct
+    {
+        // data on hit
+        unsigned _nodeId = 0;
+        Node * _node = nullptr;
+        wxRect _currentRect;
+        NodeLayout _currentLayout;
+        int _connectorSelect = -1;
+        //
+        HitStruct() {}
+        HitStruct(const HitStruct &) = default;
+        void clear()
+        {
+            _nodeId = 0;
+            _connectorSelect = -1;
+            _node = nullptr;
+        }
+    };
+
 
 public:
     /*!
@@ -108,6 +139,52 @@ public:
     }
 
 
+    /*!
+     * \brief removeEdgesFromInput
+     * \param id
+     * \param connector
+     */
+    void removeEdgesFromInput(unsigned id, int connector)
+    {
+        NodePtr &n = findNode(id);
+        if(n && (connector >= 0))
+        {
+            NODEFLOW::ItemListPtr &l = n->inputs()[connector];
+            if(l)
+            {
+                NODEFLOW::ItemList c;
+                c = *l; // copy list
+                for(auto i = c.begin(); i != c.end(); i++ )
+                {
+                    disconnect(*i); // delete the edges - disconnect modifies the input lists on the nodes
+                }
+            }
+        }
+    }
+
+    /*!
+     * \brief removeEdgesFromOutput
+     * \param id
+     * \param connector
+     */
+    void removeEdgesFromOutput(unsigned id, int connector)
+    {
+        NodePtr &n = findNode(id);
+        if(n && (connector >= 0))
+        {
+            NODEFLOW::ItemListPtr &l = n->outputs()[connector];
+            if(l)
+            {
+                NODEFLOW::ItemList c;
+                c = *l; // copy list
+                for(auto i = c.begin(); i != c.end(); i++ )
+                {
+                    disconnect(*i); // delete the edges - disconnect modifies the input lists on the nodes
+                }
+            }
+        }
+    }
+
 
     /*!
      * \brief edges
@@ -131,12 +208,14 @@ public:
         }
     }
     //
-     MRL::VariantPropertyTree & data() { return  _data;}
+    MRL::VariantPropertyTree & data() {
+        return  _data;
+    }
     /*!
      * \brief addNode of given type
      * \param s - either const std::string & or size_t
      */
-     template<typename T>
+    template<typename T>
     unsigned addNode(T s, int x = 0, int y = 0, unsigned id = 0)
     {
         try
@@ -159,6 +238,7 @@ public:
                     std::string sn = "ID" + std::to_string(id);
                     data().setValue(p,"Name",sn);
                     n->save(*this);
+                    return id;
                 }
             }
         }
@@ -273,11 +353,38 @@ public:
     virtual void save();
 
     //
-    VALUE & inValue()  { return _inValue;}
-    VALUEQUEUE & outValue()  { return _outValue;}
-    void setInValue(const VALUE &v) { _inValue = v;}
-    void setOutValue(const VALUE &v) { _outValue.push(v);}
-    //
+    VALUE & inValue()  {
+        return _inValue;
+    }
+    /*!
+     * \brief outValue
+     * \return
+     */
+    VALUEQUEUE & outValue()  {
+        return _outValue;
+    }
+    /*!
+     * \brief setInValue
+     * \param v
+     */
+    void setInValue(const VALUE &v) {
+        _inValue = v;
+    }
+    /*!
+     * \brief setOutValue
+     * \param v
+     */
+    void setOutValue(const VALUE &v) {
+        _outValue.push(v);
+    }
+    /*!
+     * \brief hitTest
+     * \param pt
+     * \return
+     */
+    int hitTest(wxPoint &pt, HitStruct &);
+
+    void makeConnectionSelect(wxPoint &pt, wxPoint &startPoint, int state, NodeSet::HitStruct &start);
 
 };
 }
