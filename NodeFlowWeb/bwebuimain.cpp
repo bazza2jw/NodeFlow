@@ -21,6 +21,9 @@
 #include "bwebnavigationtree.h"
 #include <Wt/WFitLayout.h>
 #include "webcanvas.h"
+#include "webaddobjectdialog.h"
+#include "webdialog.h"
+
 /*!
     \brief BWebUiMain::BWebUiMain
     \param parent
@@ -35,15 +38,28 @@ NODEFLOW::BWebUiMain::BWebUiMain() {
     auto fitlayout = layout->addLayout(std::make_unique<Wt::WFitLayout>(),5);
     //
     // Add menu
-    auto m = std::make_unique<Wt::WMenu>();
+    std::unique_ptr<Wt::WMenu> m = std::make_unique<Wt::WMenu>();
+    std::unique_ptr<Wt::WMenu> filem = std::make_unique<Wt::WMenu>();
+    std::unique_ptr<Wt::WMenu> actionm =  std::make_unique<Wt::WMenu>();
     //
-    // Add menu items and connect signals
+    // File menu
+    Wt::WMenuItem *i;
+    i = filem->addItem("Open");
+    i->triggered().connect(this,&NODEFLOW::BWebUiMain::onOpen);
+    i = filem->addItem("Save");
+    i->triggered().connect(this,&NODEFLOW::BWebUiMain::onSave);
+    i = filem->addItem("Save As");
+    i->triggered().connect(this,&NODEFLOW::BWebUiMain::onSaveAs);
     //
-    _logout = m->addItem("Logout");
-    _properties = m->addItem("System Properties");
-    _alias = m->addItem("Alias Setup");
-    _user = m->addItem("User Configuration");
-
+    // Action menu
+    i = actionm->addItem("Start");
+    i->triggered().connect(this,&NODEFLOW::BWebUiMain::onStart);
+    i = actionm->addItem("Step");
+    i->triggered().connect(this,&NODEFLOW::BWebUiMain::onStep);
+    //
+    m->addMenu("File",std::move(filem));
+    m->addMenu("Action",std::move(actionm));
+    //
     _navigationBar->addMenu(std::move(m));
     //
     // add the tab widget
@@ -51,83 +67,72 @@ NODEFLOW::BWebUiMain::BWebUiMain() {
     //
     // Navigator tab
     //
-    std::unique_ptr<NODEFLOW::WebCanvas> ct((_canvas = new NODEFLOW::WebCanvas() ));
+    auto wc = std::make_unique<Wt::WContainerWidget>();
     //
-    Wt::WLength wd(600,Wt::LengthUnit::Pixel);
-    ct->resize(wd,wd);
-    st->addTab(std::move(ct), "Node Editor");
-    //
-    // add a status bar
-    //
-    auto toolb = layout->addLayout(std::make_unique<Wt::WHBoxLayout>(), 1);
-    _editItem = toolb->addWidget(std::make_unique<Wt::WPushButton>("Options..."), 1);
-    _restartButton = toolb->addWidget(std::make_unique<Wt::WPushButton>("Restart"), 1);
-    _startButton = toolb->addWidget(std::make_unique<Wt::WPushButton>("Start"), 1);
-    _stopButton = toolb->addWidget(std::make_unique<Wt::WPushButton>("Stop"), 1);
-    auto sb =   toolb->addWidget(std::make_unique<Wt::WLabel>(), 8);
-    sb->setText("Status OK");
-    //
-    _logout->triggered().connect(this, &NODEFLOW::BWebUiMain::onLogout);
-    _properties->triggered().connect(this, &NODEFLOW::BWebUiMain::onProperties);
-    _alias->triggered().connect(this, &NODEFLOW::BWebUiMain::onAliasSetup);
-    _editItem->clicked().connect(this, &NODEFLOW::BWebUiMain::onEditItem);
-    _restartButton->clicked().connect(this, &NODEFLOW::BWebUiMain::onRestart);
-    _startButton->clicked().connect(this, &NODEFLOW::BWebUiMain::onStart);
-    _stopButton->clicked().connect(this, &NODEFLOW::BWebUiMain::onStop);
-    _user->triggered().connect(this, &NODEFLOW::BWebUiMain::onUser);
-    //
+    auto canvasFitlayout = std::make_unique<Wt::WFitLayout>();
+    _canvas = canvasFitlayout->addWidget(std::make_unique<NODEFLOW::WebCanvas>());
+
+    wc->setLayout(std::move(canvasFitlayout));
+    st->addTab(std::move(wc), "Node Editor",Wt::ContentLoading::Eager);
+
+    Wt::WLength wd(900,Wt::LengthUnit::Pixel);
+    st->resize(wd,wd);
     setLayout(std::move(layout));
 }
 
 /*!
- * \brief NODEFLOW::BWebUiMain::onAliasSetup
+ * \brief NODEFLOW::BWebUiMain::onOpen
  */
-void NODEFLOW::BWebUiMain::onAliasSetup()
+void NODEFLOW::BWebUiMain::onOpen()
 {
-}
+    // open flow on server
+    std::unique_ptr<NODEFLOW::WebOpenFlowForm> p = std::make_unique<NODEFLOW::WebOpenFlowForm>(_canvas);
+    NODEFLOW::WebDialogBase::showDialog<>(this,p);
 
-/*!
-    \brief NODEFLOW::BWebUiMain::onRestart
-*/
-void NODEFLOW::BWebUiMain::onRestart() {
 }
 /*!
-    \brief NODEFLOW::BWebUiMain::onStart
-*/
-void NODEFLOW::BWebUiMain::onStart() {
+ * \brief NODEFLOW::BWebUiMain::onSave
+ */
+void NODEFLOW::BWebUiMain::onSave()
+{
+    // save flow to server
+    _canvas->save();
 }
 /*!
-    \brief NODEFLOW::BWebUiMain::onStop
-*/
-void NODEFLOW::BWebUiMain::onStop() {
+ * \brief NODEFLOW::BWebUiMain::onSaveAs
+ */
+void NODEFLOW::BWebUiMain::onSaveAs()
+{
+    // save as
+    std::unique_ptr<NODEFLOW::WebSaveAsFlowForm> p = std::make_unique<NODEFLOW::WebSaveAsFlowForm>(_canvas);
+    NODEFLOW::WebDialogBase::showDialog<>(this,p);
 }
-
-
-
 /*!
-    \brief NODEFLOW::BWebUiMain::onLogout
-*/
-void NODEFLOW::BWebUiMain::onLogout() {
-    Wt::StandardButton result = Wt::WMessageBox::show("Confirm", "Logout?",  Wt::StandardButton::Ok | Wt::StandardButton::Cancel);
-    if (result == Wt::StandardButton::Ok) {
-        // Do logout
-        Wt::WApplication::instance()->quit();
+ * \brief NODEFLOW::BWebUiMain::onStart
+ */
+void NODEFLOW::BWebUiMain::onStart()
+{
+    // Action a start
+    _canvas->nodes().start();
+}
+/*!
+ * \brief NODEFLOW::BWebUiMain::onStep
+ */
+void NODEFLOW::BWebUiMain::onStep()
+{
+    // drive a step
+    _canvas->nodes().step(_value);
+    // now read the output queue and print it
+    NODEFLOW::NodeSet &st = _canvas->nodes();
+    NODEFLOW::VALUEQUEUE &q = st.outValue();
+    while(q.size() > 0)
+    {
+//        std::string s;
+//        MRL::jsonToString(q.front(), s);
+//        GetListTrace()->AppendString(s);
+        q.pop();
     }
 }
 
-/*!
-    \brief NODEFLOW::BWebUiMain::onProperties
-*/
-void NODEFLOW::BWebUiMain::onProperties() {
-}
 
-/*!
-    \brief NODEFLOW::BWebUiMain::onEditItem
-*/
-void NODEFLOW::BWebUiMain::onEditItem() {
-    _editItem->setFocus(false);
-}
 
-void NODEFLOW::BWebUiMain::onUser()
-{
-}

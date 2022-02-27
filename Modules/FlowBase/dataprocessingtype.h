@@ -11,6 +11,109 @@
 namespace NODEFLOW
 {
 
+    // set an attritbute to a JSON value
+    class AttributeSetterNodeType  : public NodeType
+    {
+        enum
+        {
+            Input = 0,
+            Output = 0,
+        };
+    public:
+        AttributeSetterNodeType(const std::string &s) : NodeType(s) {}
+        virtual const char * nodeClass() const { return "Data Processor";}
+
+        virtual bool process(NodeSet &ns, unsigned nodeId, unsigned id, const VALUE &data)
+        {
+            NodePtr &n = ns.findNode(nodeId);
+            if(n && n->enabled())
+            {
+
+                switch(id)
+                {
+                case 0:
+                {
+                    MRL::PropertyPath p;
+                    n->toPath(p);
+                    VALUE result = data;
+                    std::string an = ns.data().getValue<std::string>(p,"AttributeName");
+                    result[an] = n->data(); // set the data
+                    post(ns,nodeId,Output,result);
+                }
+                    break;
+                default:
+                    break;
+                }
+            }
+            return false;
+        }
+
+        virtual void start(NodeSet &ns,  NodePtr &node)
+        {
+            try
+            {
+                if(node)
+                {
+                    MRL::PropertyPath p;
+                    node->toPath(p);
+                    std::string av = ns.data().getValue<std::string>(p,"AttributeValue");
+                    MRL::stringToJson(av,node->data());
+                }
+            }
+            CATCH_DEF
+        }
+
+
+        /*!
+         * \brief setupConnections
+         */
+        void setupConnections()
+        {
+            inputs().resize(1);
+            //
+            inputs()[0] = Connection("in",Single,Any);
+            //
+            // set up the outputs
+            outputs().resize(1);
+            outputs()[0] = Connection("out",Multiple,Any); // pass through
+        }
+
+
+        /*!
+         * \brief load
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg.loader().addStringProperty("Attribute Name","AttributeName",ns.data().getValue<std::string>(p,"AttributeName"));
+            dlg.loader().addStringProperty("Attribute Value","AttributeValue",ns.data().getValue<std::string>(p,"AttributeValue")); // the value is a JSON string
+        }
+        /*!
+         * \brief save
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            wxVariant fa = dlg.loader().fields()[PropField1]->GetValue();
+            ns.data().setValue(p,"AttributeName",fa.GetString().ToStdString());
+            wxVariant fv = dlg.loader().fields()[PropField2]->GetValue();
+            ns.data().setValue(p,"AttributeValue",fv.GetString().ToStdString());
+        }
+
+
+    };
+
+
+
+
+
+
     class StatisticsNodeType : public NodeType
     {
 
@@ -21,7 +124,8 @@ namespace NODEFLOW
             Mean,
             SD,
             Min,
-            Max
+            Max,
+            Aggregated
         };
         class StatsNode : public Node
         {
@@ -86,6 +190,7 @@ namespace NODEFLOW
                         sn->stats().evaluate();
                         VALUE result;
                         //
+
                         double a = sn->stats().statistics().getMean();
                         setValueData(data,a,result);
                         post(ns,nodeId,Mean,result);
@@ -101,6 +206,13 @@ namespace NODEFLOW
                         a = sn->stats().statistics().getMaximum();
                         setValueData(data,a,result);
                         post(ns,nodeId,Max,result);
+
+                        result = data;
+                        Json::Value v;
+                        sn->stats().statistics().toJson(v);
+                        result[DATA_PAYLOAD] = v;
+                        post(ns,nodeId,Aggregated,result);
+
                     }
                 }
                 default:
@@ -121,12 +233,13 @@ namespace NODEFLOW
             inputs()[0] = Connection("in",Single,Float);
             //
             // set up the outputs
-            outputs().resize(5);
+            outputs().resize(6);
             outputs()[0] = Connection("out",Multiple,Float); // pass through
             outputs()[1] = Connection("Mean",Multiple,Float);
             outputs()[2] = Connection("SD",Multiple,Float);
             outputs()[3] = Connection("Min",Multiple,Float);
             outputs()[4] = Connection("Max",Multiple,Float);
+            outputs()[5] = Connection("Aggregated",Multiple,Any); // stats packet
         }
 
         /*!
@@ -442,12 +555,13 @@ namespace NODEFLOW
         enum
         {
             Input = 0,
-            HiHiOutput = 0,
-            HiLoOutput = 1,
-            OkOutput = 2,
-            LoHiOutput = 3,
-            LoLoOutput = 4,
-            StateOutput = 5
+            Output = 0,
+            HiHiOutput,
+            HiLoOutput,
+            OkOutput,
+            LoHiOutput,
+            LoLoOutput,
+            StateOutput
 
         };
     public:
@@ -464,13 +578,14 @@ namespace NODEFLOW
             inputs().resize(1);
             inputs()[0] = Connection("in",Single,Float);
             // set up the outputs
-            outputs().resize(6);
-            outputs()[0] = Connection("HiHi",Multiple,Bool);
-            outputs()[0] = Connection("HiLo",Multiple,Bool);
-            outputs()[1] = Connection("Ok",Multiple,Bool);
-            outputs()[2] = Connection("LoHi",Multiple,Bool);
-            outputs()[2] = Connection("LoLo",Multiple,Bool);
-            outputs()[3] = Connection("State",Multiple,Integer);
+            outputs().resize(7);
+            outputs()[0] = Connection("Out",Multiple,Float);
+            outputs()[1] = Connection("HiHi",Multiple,Bool);
+            outputs()[2] = Connection("HiLo",Multiple,Bool);
+            outputs()[3] = Connection("Ok",Multiple,Bool);
+            outputs()[4] = Connection("LoHi",Multiple,Bool);
+            outputs()[5] = Connection("LoLo",Multiple,Bool);
+            outputs()[6] = Connection("State",Multiple,Integer);
         }
         /*!
          * \brief start
@@ -508,6 +623,7 @@ namespace NODEFLOW
             if(n && n->enabled())
             {
                 VALUE result;
+
                 switch(id)
                 {
                 case Input:
@@ -515,6 +631,7 @@ namespace NODEFLOW
                     double v = data[DATA_PAYLOAD].asDouble();
                     n->data()["IN"] = v;
                     int state = 0;
+                    post(ns,nodeId,Output,data); // forward data
 
                     if(v > n->data()["HIHILIMIT"].asDouble())
                     {

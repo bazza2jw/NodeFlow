@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
+#
+# NB - Only a start - does not work
+#
 set(MODULE NodeFlowWeb)
 project(${MODULE})
 

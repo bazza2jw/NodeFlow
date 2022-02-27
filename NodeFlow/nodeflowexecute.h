@@ -12,25 +12,29 @@
 
 #ifndef NODEFLOWEXECUTE_H
 #define NODEFLOWEXECUTE_H
-//
+#include <wx/event.h>
 #include "nodetype.h"
 #include "nodeset.h"
 #include "node.h"
 //
+
 namespace NODEFLOW
 {
 /*!
      * \brief The NodeFlowExecute class
      */
-    class NodeFlowExecute
+    class NodeFlowExecute : public wxEvtHandler
     {
-        NodeSet _set;
-        VALUEQUEUE _in;
+        NODEFLOW::NodeSet _set;
+        NODEFLOW::VALUEQUEUE _in;
     public:
         NodeFlowExecute();
         bool load(const std::string &s);
         void process();
-        void post(const VALUE &v ) { _in.push(v);}
+        void post(const NODEFLOW::VALUE &v ) { _in.push(v);}
     };
+
 }
+
+
 #endif // NODEFLOWEXECUTE_H

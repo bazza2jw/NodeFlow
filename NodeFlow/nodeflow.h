@@ -13,12 +13,10 @@
 #ifndef NODEFLOW_H
 #define NODEFLOW_H
 
+#define NODEFLOW_ROOT_DIR "/usr/local/NodeFlow"
 namespace NODEFLOW
 {
-    class NodeFlow
-    {
-    public:
-        NodeFlow(){};
-    };
+
+
 }
 #endif // NODEFLOW_H

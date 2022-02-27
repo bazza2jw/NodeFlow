@@ -18,4 +18,5 @@ void addDataProcessing()
     NODEFLOW::NodeType::addType<NODEFLOW::WindowThresholdTypeNode>("HiLoThreshold"); // high low range test
     NODEFLOW::NodeType::addType<NODEFLOW::StatisticsNodeType>("Statistics"); // rolling buffer stats
     NODEFLOW::NodeType::addType<NODEFLOW::HiHiLoLoThresholdTypeNode>("HiHiLoLo");// action / alert levels
+    NODEFLOW::NodeType::addType<NODEFLOW::AttributeSetterNodeType>("AttributeSetter"); // set an extra attribute to a JSON value
 }

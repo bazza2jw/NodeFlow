@@ -27,6 +27,8 @@
 #include <Wt/WBootstrapTheme.h>
 #include "bwebnavigationtree.h"
 #include <Wt/WPushButton.h>
+#include "NodeFlow/node.h"
+
 namespace NODEFLOW {
     /*!
            \brief The BWebUiMain class
@@ -38,32 +40,20 @@ namespace NODEFLOW {
             Wt::WNavigationBar *_navigationBar = nullptr;
             //
             // Top level menu items
-            Wt::WMenuItem *_logout = nullptr;
-            Wt::WMenuItem *_properties = nullptr;
-            Wt::WMenuItem *_alias = nullptr;
-            Wt::WMenuItem *_user = nullptr;
-
-
-            Wt::WPushButton *_editItem = nullptr;
-            Wt::WPushButton *_restartButton = nullptr;
-            Wt::WPushButton *_startButton = nullptr;
-            Wt::WPushButton *_stopButton = nullptr;
             WebCanvas * _canvas = nullptr;
             //
+            VALUE _value;
         public:
             BWebUiMain();
             Wt::WNavigationBar *navigationBar() {
                 return _navigationBar;
             }
 protected:
-        void onLogout();
-        void onProperties();
-        void onEditItem();
-        void onRestart();
-        void onStart();
-        void onStop();
-        void onAliasSetup();
-        void onUser();
+            void onOpen();
+            void onSave();
+            void onSaveAs();
+            void onStart();
+            void onStep();
     };
 }
 #endif // BWEBUIMAIN_H

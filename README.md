@@ -1,8 +1,13 @@
 # NodeFlow
 
-This is in development 
+This is in development. 
 
 Node based flow framework in C++ similar in concept to Node Red 
+
+This is hopefully useful - procedural node based programming has lots of applications
+
+Possibly just use as examples of C++, wxWidgets and Wt
+
 
 
 Features
@@ -20,15 +25,18 @@ Relational operators nodes can act as data packet routers
 
 Binary operators can have the B input defaulted otherwise both A and B inputs have to be triggered to generate an output
 
+There are data processing nodes, such as rolling statisics.
+
 Data packets (JSON Values) can be routed by topic. Topic can be changed.
 
 
 Program Structure
 =================
 
-Generally the functions are performed by NodeType derived classes. The other classes hold data.
+Generally the functions are performed by NodeType derived classes. The other classes hold data. In some cases classes derived form Node are required to store extra data items.
 
-The NodeSet class is the graph of the nodes (Node) and the connections (Edge). The NodeSet is the execution context.  To run a flow  the NodeSet is executed/processed (by calling NodeSet::step). The NodeSet::start function is called to initialise all nodes.
+
+The NodeSet class is the graph of the nodes (Node) and the connections (Edge). The NodeSet is the execution context.  To run a flow  the NodeSet is executed/processed (by calling NodeSet::step). The NodeSet::start function is called to initialise all nodes. A NodeSet has a Variant Property Tree to store the node layout and node properties and anything else that springs to mind.
 
 All nodes receive the step call then the trigger call. 
 
@@ -59,6 +67,11 @@ GUI
 The GUI is a graphical node set editor. Drag and drop nodes form the list on the left on to canvas. Connect nodes by left-down on an  output and draging to an input. Right click on a node ot get a context menu that includes editing properties and deleting nodes. To delete connections right click on a input or output and select delete connections.
 
 Node connections have colour coded type. Nodes must be of the same type (Bool, Integer, Float and String) to be connected. There is an Any type that can connect to any other type. 
+
+Web Interface
+=============
+
+The web version of the Node Editor has been written using Wt. The port is 8083. 
 
 
 Building

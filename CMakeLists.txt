@@ -9,15 +9,14 @@
  #* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  #* A PARTICULAR PURPOSE.
 #
-# Build and install VisualCalc before building these
 #
 cmake_minimum_required(VERSION 3.10)
 project(NodeFlow)
 include (Common.cmake)
 add_subdirectory(NodeFlow)
 add_subdirectory(NodeEditor)
-add_subdirectory(NodeFlowWeb)
 add_subdirectory(Modules)
+add_subdirectory(NodeFlowWeb)
 #
 
 

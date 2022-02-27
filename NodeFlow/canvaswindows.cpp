@@ -224,7 +224,8 @@ void CanvasWindows::onMotion(wxMouseEvent &event)
  */
 void CanvasWindows::OnDraw (wxDC &dc)
 {
-    _draw.draw(dc);
+    wxRect r = this->GetRect(); // when pan and zoom added change to draw only in region
+    _draw.draw(dc,r);
 }
 
 

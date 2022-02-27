@@ -17,6 +17,7 @@
 #   include "wx/wx.h"
 #endif
 //
+#include "nodeflow.h"
 #include <memory>
 #include <map>
 #include <wx/gdicmn.h>
@@ -24,18 +25,10 @@
 #include <wx/graphics.h>
 #include "nodetype.h"
 #include "edge.h"
-#include <Wt/WPaintDevice.h>
-#include <Wt/WRectF.h>
-#include <Wt/WPoint.h>
-#include <Wt/WPointF.h>
-#include <Wt/WPen.h>
-#include <Wt/WBrush.h>
-#include <Wt/WColor.h>
-#include <Wt/WFont.h>
-#include <Wt/WPaintedWidget.h>
-#include <Wt/WPainter.h>
-#include <Wt/WPainterPath.h>
+#include <wx/url.h>
+//
 
+//
 // This resolves platform differences - there is a lot of same but different code
 // a lot of things are the same but use different functions calls and formats
 
@@ -66,7 +59,7 @@ public:
     NodeDrawWx (NodeSet &s );
     NodeDrawWx (const NodeDrawWx & rhs) = delete;
     virtual ~NodeDrawWx () {}
-    virtual void draw(wxDC &dc);
+    virtual void draw(wxDC &dc, const wxRect &area);
     void drawSpline(wxDC &dc,wxPoint beg, wxPoint end)
     {
         wxPoint pts[4];
@@ -82,37 +75,50 @@ public:
     }
 };
 
-//
-// The Wt version
-//
-class NodeDrawWt
+class NodeDrawBitmap : public NodeDrawWx
 {
-    EdgeIdSet _edgeDrawSet; // only draw an edge once if necesary
+    wxSize                              _size;
+    wxBitmap                            _bitmap;
     //
-    Wt::WPen _normalPen;
-    Wt::WPen _selectPen;
-    Wt::WPen _erasePen;
-    Wt::WBrush _eraseBrush;
-    Wt::WFont _connectionFont;
-    Wt::WFont _titleFont;
-    Wt::WBrush _boolBrush;
-    Wt::WBrush _intBrush;
-    Wt::WBrush _floatBrush;
-    Wt::WBrush _stringBrush;
-    Wt::WBrush _anyBrush;
-    //
-    NodeSet &_nodeSet;
-    //
-    virtual void drawNode(Wt::WPainter &dc, NodePtr &n);
-    virtual void drawEdge(Wt::WPainter &dc, EdgePtr &);
-    //
+    static unsigned _gSession;
+    unsigned _session = 100;
+    wxString _bitFilename;
+    wxString _url;
 public:
-    void drawSpline(Wt::WPainter &dc,wxPoint beg, wxPoint end);
-    NodeDrawWt (NodeSet &s );
-    NodeDrawWt (const NodeDrawWt & rhs) = delete;
-    virtual ~NodeDrawWt () {}
-    virtual void draw(Wt::WPainter &dc);
+    NodeDrawBitmap(NodeSet &s, int w, int h)
+        : NodeDrawWx(s),
+          _bitmap(2048,2048,32),
+          _size(2048,2048)
+    {
+        _session = _gSession++;
+    }
+    /*!
+     * \brief session
+     */
+    unsigned session() const { return _session;}
+    //
+    const wxString & bitFilename() { return _bitFilename;}
+    //
+    const wxString & url() const { return _url; }
+    //
+    void draw(wxRect &area)
+    {
+        wxMemoryDC DC(_bitmap);
+        NodeDrawWx::draw(DC,area);
+        DC.SelectObject(wxNullBitmap);
+    }
+    //
+    const wxSize & size() { return  _size;}
+    //
+    void store()
+    {
+            _bitFilename = wxString::Format(NODEFLOW_ROOT_DIR "/bin/canvas/%08X.png",_session); // save for access in the bin directory which is the doc root
+            _url = wxString::Format( "canvas/%08X.png",_session);
+            _bitmap.SaveFile(_bitFilename,wxBITMAP_TYPE_PNG);
+    }
+
 };
+
 
 
 
