@@ -96,6 +96,8 @@ ENDIF( DEFINED CROSSBUILD )
 #enable debug tracing
 #add_definitions(-DTRACE_ON)
 #
+# enable the use of Wt , web UI support
+add_definitions(-DUSE_WT)
 set(WTLIBS  -lwt -lwthttp)
 #
 link_directories(/usr/local/MRL/lib)

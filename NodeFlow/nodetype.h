@@ -24,6 +24,7 @@ namespace NODEFLOW
 class NodeSet;
 class NodeLayout;
 class NodeType;
+class WebProperties;
 //
 typedef std::shared_ptr<Json::Value> VALUEPTR; // data packet mostly between nodes
 //
@@ -274,6 +275,7 @@ public:
     }
     /*!
      * \brief properties
+     * Properties dialog for wxWidgets
      * \param n
      * \param nodeId
      * \return true if ok
@@ -281,6 +283,16 @@ public:
     virtual bool properties(wxWindow * parent, NodeSet &ns, unsigned nodeId);
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p);
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p);
+    //
+    // Properties for Wt -
+    //
+#ifdef USE_WT
+    virtual bool properties(Wt::WWidget *parent, NodeSet &ns, unsigned nodeId);
+    virtual void load(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p);
+    virtual void save(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p);
+    //
+#endif
+
     /*!
      * \brief propertiesUpdated
      * \param n

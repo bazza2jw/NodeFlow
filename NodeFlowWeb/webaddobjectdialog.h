@@ -1,7 +1,7 @@
 #ifndef WEBADDOBJECTDIALOG_H
 #define WEBADDOBJECTDIALOG_H
 
-#include "webdialog.h"
+#include "NodeFlow/webdialog.h"
 #include <Wt/WDialog.h>
 #include <Wt/WComboBox.h>
 #include <Wt/WLineEdit.h>

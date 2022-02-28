@@ -22,7 +22,7 @@
 #include <Wt/WFitLayout.h>
 #include "webcanvas.h"
 #include "webaddobjectdialog.h"
-#include "webdialog.h"
+#include "NodeFlow/webdialog.h"
 
 /*!
     \brief BWebUiMain::BWebUiMain

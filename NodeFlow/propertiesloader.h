@@ -47,6 +47,35 @@ public:
     wxEnumProperty * addChoiceProperty(const wxString &label, const wxString &name, int value, const wxArrayString &labels, const wxArrayInt &values = wxArrayInt());
     wxColourProperty * addColourProperty(const wxString &label, const wxString &name, wxColour v);
     std::vector<wxPGProperty *> & fields()  { return _fields;}
+
+    template <typename T>  T get(unsigned i)
+    {
+        if(i < _fields.size())
+        {
+            wxAny v = _fields[i]->GetValue();
+            return v.As<T>();
+
+        }
+        return T(0);
+    }
+
+    std::string get(unsigned i ) {
+        if(i < _fields.size())
+        {
+            wxAny v = _fields[i]->GetValue();
+            wxString s = v.As<wxString>();
+            return s.ToStdString();
+        }
+    }
+    //
+    wxPGProperty * addProp( const wxString &label, const wxString &name, int v ) { return addIntProperty(label,name, v);}
+    wxPGProperty * addProp( const wxString &label,const wxString &name, double v) { return addFloatProperty(label,name,v);}
+    wxPGProperty * addProp( const wxString &label,const wxString &name, bool v ) { return addBoolProperty(label,name,v);}
+    wxPGProperty * addProp( const wxString &label,const wxString &name, std::string & v ) { return addStringProperty(label,name,v);}
+    wxPGProperty * addProp( const wxString &label,const wxString &name, wxColour v ) { return addColourProperty(label,name,v);}
+
+
+
 };
 
 #endif // PROPERTIESLOADER_H

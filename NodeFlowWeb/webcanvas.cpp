@@ -3,7 +3,7 @@
 #include <Wt/WMenu.h>
 #include <Wt/WPopupMenu.h>
 #include "webaddobjectdialog.h"
-#include "webdialog.h"
+#include "NodeFlow/webdialog.h"
 /*!
  * \brief NODEFLOW::WebCanvas::WebCanvas
  */
@@ -345,6 +345,7 @@ void NODEFLOW::WebCanvas::mouseDown(const Wt::WMouseEvent& e) {
                         {
                         case 2:
                             // delete the current node
+                            _nodes.deleteNode(_currentHit._nodeId);
                             break;
                         case 1:
                             // Properties
@@ -371,10 +372,7 @@ void NODEFLOW::WebCanvas::mouseDown(const Wt::WMouseEvent& e) {
                         switch(a)
                         {
                         case 2:
-                            // delete the current node
-                            break;
-                        case 1:
-                            // Properties
+                            _nodes.removeEdgesFromInput(_currentHit._nodeId,_currentHit._connectorSelect);
                             break;
                         default:
                             break;
@@ -399,10 +397,7 @@ void NODEFLOW::WebCanvas::mouseDown(const Wt::WMouseEvent& e) {
                         switch(a)
                         {
                         case 2:
-                            // delete the current node
-                            break;
-                        case 1:
-                            // Properties
+                            _nodes.removeEdgesFromOutput(_currentHit._nodeId,_currentHit._connectorSelect);
                             break;
                         default:
                             break;

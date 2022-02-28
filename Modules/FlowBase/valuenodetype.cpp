@@ -14,6 +14,7 @@
 #include "NodeFlow/nodeset.h"
 #include "NodeFlow/PropertiesEditorDialog.h"
 #include <cstdlib>
+#include <NodeFlow/webproperties.h>
 /*!
  * \brief The IntegerNodeType class
  */
@@ -32,6 +33,19 @@ public:
         wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
         ns.data().setValue(p,"Value",v.GetInteger());
     }
+
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        ValueNodeType<int,NODEFLOW::Integer>::load(dlg,ns,p);
+        dlg->addIntProperty("Value",ns.data().getValue<int>(p,"Value"));
+    }
+
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        ValueNodeType<int,NODEFLOW::Integer>::save(dlg,ns,p);
+        ns.data().setValue(p,"Value",dlg->getInt(NODEFLOW::PropField1));
+    }
+
 };
 /*!
  * \brief The DoubleNodeType class
