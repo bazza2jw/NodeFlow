@@ -6,6 +6,7 @@
 #include "../../NodeFlow/fparser.hh"
 #include "../../NodeFlow/PropertiesEditorDialog.h"
 #include <MrlLib/rollingbuffer.hpp>
+#include "NodeFlow/webproperties.h"
 
 
 namespace NODEFLOW
@@ -100,11 +101,36 @@ namespace NODEFLOW
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             NodeType::save(dlg,ns,p);
-            wxVariant fa = dlg.loader().fields()[PropField1]->GetValue();
-            ns.data().setValue(p,"AttributeName",fa.GetString().ToStdString());
-            wxVariant fv = dlg.loader().fields()[PropField2]->GetValue();
-            ns.data().setValue(p,"AttributeValue",fv.GetString().ToStdString());
+            ns.data().setValue(p,"AttributeName",dlg.loader().get<wxString>(PropField1).ToStdString());
+            ns.data().setValue(p,"AttributeValue",dlg.loader().get<wxString>(PropField2).ToStdString());
         }
+        /*!
+         * \brief load
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addStringProperty("Attribute Name",ns.data().getValue<std::string>(p,"AttributeName"));
+            dlg->addStringProperty("Attribute Value",ns.data().getValue<std::string>(p,"AttributeValue"));
+        }
+        /*!
+         * \brief save
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            std::string  v =  dlg->getString(NODEFLOW::PropField1);
+            ns.data().setValue(p,"AttributeName",v);
+            v = dlg->getString(NODEFLOW::PropField2);
+            ns.data().setValue(p,"AttributeName",v);
+        }
+
 
 
     };
@@ -266,6 +292,28 @@ namespace NODEFLOW
             ns.data().setValue(p,"Width",int(fv.GetInteger()));
         }
 
+        /*!
+         * \brief load
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addIntProperty("Buffer Width",ns.data().getValue<int>(p,"Width"));
+        }
+        /*!
+         * \brief save
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            ns.data().setValue(p,"Width",dlg->getInt(NODEFLOW::PropField1));
+        }
 
 
     };
@@ -397,11 +445,34 @@ namespace NODEFLOW
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             NodeType::save(dlg,ns,p);
-            wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
-            ns.data().setValue(p,"Scale",v.GetDouble());
-            v = dlg.loader().fields()[PropField2]->GetValue();
-            ns.data().setValue(p,"Offset",v.GetDouble());
+            ns.data().setValue(p,"Scale",dlg.loader().get<double>(PropField1));
+            ns.data().setValue(p,"Offset",dlg.loader().get<double>(PropField2));
         }
+        /*!
+         * \brief load
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addProp("Scale",ns.data().getValue<double>(p,"Scale"));
+            dlg->addProp("Offset",ns.data().getValue<double>(p,"Offset"));
+        }
+        /*!
+         * \brief save
+         * \param dlg
+         * \param ns
+         * \param p
+         */
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            ns.data().setValue(p,"Scale",dlg->getFloat(PropField1));
+            ns.data().setValue(p,"Offset",dlg->getFloat(PropField2));
+        }
+
     };
 
 
@@ -536,11 +607,28 @@ namespace NODEFLOW
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             NodeType::save(dlg,ns,p);
-            wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
-            ns.data().setValue(p,"HiLimit",v.GetDouble());
-            v = dlg.loader().fields()[PropField2]->GetValue();
-            ns.data().setValue(p,"LoLimit",v.GetDouble());
+            ns.data().setValue(p,"HiLimit",dlg.loader().get<double>(PropField1));
+            ns.data().setValue(p,"LoLimit",dlg.loader().get<double>(PropField2));
         }
+
+
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addFloatProperty("HiLimit",ns.data().getValue<double>(p,"HiLimit"));
+            dlg->addFloatProperty("LoLimit",ns.data().getValue<double>(p,"LoLimit"));
+        }
+
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            double v;
+            dlg->get(PropField1,v);
+            ns.data().setValue(p,"HiLimit",v);
+            dlg->get(PropField2,v);
+            ns.data().setValue(p,"LoLimit",v);
+        }
+
     };
 
 
@@ -705,16 +793,35 @@ namespace NODEFLOW
         virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
         {
             NodeType::save(dlg,ns,p);
-            wxVariant v;
-            v = dlg.loader().fields()[PropField1]->GetValue();
-            ns.data().setValue(p,"HiHiLimit",v.GetDouble());
-            v = dlg.loader().fields()[PropField2]->GetValue();
-            ns.data().setValue(p,"HiLoLimit",v.GetDouble());
-            v = dlg.loader().fields()[PropField1]->GetValue();
-            ns.data().setValue(p,"LoHiLimit",v.GetDouble());
-            v = dlg.loader().fields()[PropField2]->GetValue();
-            ns.data().setValue(p,"LoLoLimit",v.GetDouble());
+            ns.data().setValue(p,"HiHiLimit",dlg.loader().get<double>(PropField1));
+            ns.data().setValue(p,"HiLoLimit",dlg.loader().get<double>(PropField2));
+            ns.data().setValue(p,"LoHiLimit",dlg.loader().get<double>(PropField3));
+            ns.data().setValue(p,"LoLoLimit",dlg.loader().get<double>(PropField4));
         }
+
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addFloatProperty("HiHi Limit",ns.data().getValue<double>(p,"HiHiLimit")); // field[2]
+            dlg->addFloatProperty("HiLo Limit",ns.data().getValue<double>(p,"HiLoLimit")); // field[3]
+            dlg->addFloatProperty("LoHi Limit",ns.data().getValue<double>(p,"LoHiLimit")); // field[2]
+            dlg->addFloatProperty("LoLo Limit",ns.data().getValue<double>(p,"LoLoLimit")); // field[3]
+        }
+
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            double v;
+            dlg->get(PropField1,v);
+            ns.data().setValue(p,"HiHiLimit",v);
+            dlg->get(PropField2,v);
+            ns.data().setValue(p,"HiLoLimit",v);
+            dlg->get(PropField3,v);
+            ns.data().setValue(p,"LoHiLimit",v);
+            dlg->get(PropField4,v);
+            ns.data().setValue(p,"LoLoLimit",v);
+        }
+
     };
 
 

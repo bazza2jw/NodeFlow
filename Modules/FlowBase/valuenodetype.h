@@ -4,6 +4,7 @@
 #include "NodeFlow/nodeset.h"
 #include <wx/timer.h>
 #include "NodeFlow/PropertiesEditorDialog.h"
+#include "NodeFlow/webproperties.h"
 
 namespace NODEFLOW
 {
@@ -53,6 +54,33 @@ namespace NODEFLOW
             // set up the outputs
             outputs().resize(1);
             outputs()[0] = Connection("out",Multiple,outType);
+        }
+
+
+        virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg.loader().addProp("Value","Value",ns.data().getValue<T>(p,"Value"));
+        }
+        virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            T v = dlg.loader().get<T>(NODEFLOW::PropField1);
+            ns.data().setValue(p,"Value",v);
+        }
+
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addProp("Value",ns.data().getValue<T>(p,"Value"));
+        }
+
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            T v;
+            dlg->get(NODEFLOW::PropField1,v);
+            ns.data().setValue(p,"Value",v);
         }
 
     };
@@ -132,6 +160,22 @@ namespace NODEFLOW
             wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
             ns.data().setValue(p,"GlobalName",v.GetString().ToStdString());
         }
+
+
+        void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::load(dlg,ns,p);
+            dlg->addProp("Global Name",ns.data().getValue<std::string>(p,"GlobalName"));
+        }
+
+        void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+        {
+            NodeType::save(dlg,ns,p);
+            std::string v;
+            dlg->get(NODEFLOW::PropField1,v);
+            ns.data().setValue(p,"GlobalName",v);
+        }
+
 
     };
 

@@ -90,42 +90,42 @@ namespace NODEFLOW
         unsigned addProp(const std::string &label, int v ) { return addIntProperty(label,  v);}
         unsigned addProp(const std::string &label, double v) { return addFloatProperty(label,v);}
         unsigned addProp(const std::string &label, bool v ) { return addBoolProperty(label,v);}
-        unsigned addProp(const std::string &label, std::string & v ) { return addStringProperty(label,v);}
+        unsigned addProp(const std::string &label, const std::string & v ) { return addStringProperty(label,v);}
         //
         bool getBool(unsigned i)
         {
-            Wt::WCheckBox *p = dynamic_cast<Wt::WCheckBox *>(_table->elementAt(i+1,1)->widget(0));
+            Wt::WCheckBox *p = dynamic_cast<Wt::WCheckBox *>(_table->elementAt(i,1)->widget(0));
             return p->isChecked();
         }
 
         int getInt(unsigned i)
         {
-            Wt::WSpinBox *p = dynamic_cast<Wt::WSpinBox *>(_table->elementAt(i+1,1)->widget(0));
+            Wt::WSpinBox *p = dynamic_cast<Wt::WSpinBox *>(_table->elementAt(i,1)->widget(0));
             return p->value();
         }
 
         double getFloat(unsigned i)
         {
-            Wt::WDoubleSpinBox *p = dynamic_cast<Wt::WDoubleSpinBox *>(_table->elementAt(i+1,1)->widget(0));
+            Wt::WDoubleSpinBox *p = dynamic_cast<Wt::WDoubleSpinBox *>(_table->elementAt(i,1)->widget(0));
             return p->value();
         }
 
         std::string getString(unsigned i)
         {
-            Wt::WLineEdit *p = dynamic_cast<Wt::WDoubleSpinBox *>(_table->elementAt(i+1,1)->widget(0));
+            Wt::WLineEdit *p = dynamic_cast<Wt::WLineEdit *>(_table->elementAt(i,1)->widget(0));
             return p->text().toUTF8();
         }
 
         std::string getColour(unsigned i)
         {
-            Wt::WColorPicker *p = dynamic_cast<Wt::WColorPicker *>(_table->elementAt(i+1,1)->widget(0));
+            Wt::WColorPicker *p = dynamic_cast<Wt::WColorPicker *>(_table->elementAt(i,1)->widget(0));
             std::string s = p->color().name().toUTF8();
             return s;
         }
 
         int getChoice(unsigned i)
         {
-            Wt::WComboBox *p = dynamic_cast<Wt::WComboBox *>(_table->elementAt(i+1,1)->widget(0));
+            Wt::WComboBox *p = dynamic_cast<Wt::WComboBox *>(_table->elementAt(i,1)->widget(0));
             return p->currentIndex();
         }
     };

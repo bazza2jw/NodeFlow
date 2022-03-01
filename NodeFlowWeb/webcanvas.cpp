@@ -349,6 +349,12 @@ void NODEFLOW::WebCanvas::mouseDown(const Wt::WMouseEvent& e) {
                             break;
                         case 1:
                             // Properties
+                        {
+                            _currentHit._node->save(_nodes); // save curent location
+                            _currentHit._node->nodeType()->properties(this,_nodes,_currentHit._nodeId);
+                            _currentHit._node->load(_nodes); // load any changed attiributes
+
+                        }
                             break;
                         default:
                             break;

@@ -56,7 +56,7 @@ public:
             return v.As<T>();
 
         }
-        return T(0);
+        return T();
     }
 
     std::string get(unsigned i ) {
@@ -71,7 +71,7 @@ public:
     wxPGProperty * addProp( const wxString &label, const wxString &name, int v ) { return addIntProperty(label,name, v);}
     wxPGProperty * addProp( const wxString &label,const wxString &name, double v) { return addFloatProperty(label,name,v);}
     wxPGProperty * addProp( const wxString &label,const wxString &name, bool v ) { return addBoolProperty(label,name,v);}
-    wxPGProperty * addProp( const wxString &label,const wxString &name, std::string & v ) { return addStringProperty(label,name,v);}
+    wxPGProperty * addProp( const wxString &label,const wxString &name, const std::string & v ) { return addStringProperty(label,name,v);}
     wxPGProperty * addProp( const wxString &label,const wxString &name, wxColour v ) { return addColourProperty(label,name,v);}
 
 

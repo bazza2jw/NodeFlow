@@ -5,6 +5,7 @@
 #include "../../NodeFlow/nodeset.h"
 #include "../../NodeFlow/fparser.hh"
 #include "../../NodeFlow/PropertiesEditorDialog.h"
+#include "NodeFlow/webproperties.h"
 
 // function nodes are generated from the functions definitions file on startup
 // functions are for double values
@@ -165,13 +166,7 @@ public:
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::load(dlg,ns,p);
-        char pb[128];
-        sprintf(pb,getProps(inType),"DefaultB","DefaultB");
-        //
-        auto w = dlg.loader().setProperty(pb);
-        T a = ns.data().getValue<T>(p,"DefaultB");
-        wxVariant v(a);
-        w->SetValue(v);
+        dlg.loader().addProp("DefaultB","DefaultB",ns.data().getValue<T>(p,"DefaultB"));
         dlg.loader().addBoolProperty("Use DefaultB","UseDefaultB",ns.data().getValue<bool>(p,"UseDefaultB")); // field[1]
     }
     /*!
@@ -183,12 +178,28 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::save(dlg,ns,p);
-        wxAny a = (dlg.loader().fields()[PropField1])->GetValue(); // get the default B field
-        T val = a.As<T>();
+        T val = dlg.loader().get<T>(PropField1);
         ns.data().setValue(p,"DefaultB",val);
-        wxVariant v = dlg.loader().fields()[PropField2]->GetValue();
-        ns.data().setValue(p,"UseDefaultB",v.GetBool());
+        ns.data().setValue(p,"UseDefaultB",dlg.loader().get<bool>(PropField2));
     }
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addProp("Use DefaultB",ns.data().getValue<bool>(p,"UseDefaultB"));
+        dlg->addProp("DefaultB",ns.data().getValue<T>(p,"DefaultB"));
+    }
+
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        T v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"DefaultB",v);
+        ns.data().setValue(p,"UseDefaultB",dlg->getBool(PropField2));
+    }
+
+
+
 };
 
 
@@ -353,14 +364,7 @@ public:
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::load(dlg,ns,p);
-        //
-        char pb[128];
-        sprintf(pb,getProps(inType),"DefaultB","DefaultB");
-        //
-        auto w = dlg.loader().setProperty(pb);
-        T a = ns.data().getValue<T>(p,"DefaultB");
-        wxVariant v(a);
-        w->SetValue(v);
+        dlg.loader().addProp("DefaultB","DefaultB",ns.data().getValue<T>(p,"DefaultB"));
         dlg.loader().addBoolProperty("Use DefaultB","UseDefaultB",ns.data().getValue<bool>(p,"UseDefaultB")); // field[1]
     }
     /*!
@@ -372,11 +376,35 @@ public:
     virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::save(dlg,ns,p);
-        wxAny a = (dlg.loader().fields()[PropField1])->GetValue(); // get the default B field
-        T val = a.As<T>();
+        T val = dlg.loader().get<T>(PropField1);
         ns.data().setValue(p,"DefaultB",val);
-        wxVariant v = dlg.loader().fields()[PropField2]->GetValue();
-        ns.data().setValue(p,"UseDefaultB",v.GetBool());
+        ns.data().setValue(p,"UseDefaultB",dlg.loader().get<bool>(PropField2));
+    }
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addProp("Use DefaultB",ns.data().getValue<bool>(p,"UseDefaultB"));
+        dlg->addProp("DefaultB",ns.data().getValue<T>(p,"DefaultB"));
+    }
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        T v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"DefaultB",v);
+        ns.data().setValue(p,"UseDefaultB",dlg->getBool(PropField2));
     }
 };
 
@@ -621,6 +649,30 @@ public:
         ns.data().setValue(p,"Topic",v.GetString().ToStdString());
     }
 
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addStringProperty("Change Topic",ns.data().getValue<std::string>(p,"Topic"));
+    }
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        std::string v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"Topic",v);
+    }
 
 };
 
@@ -764,11 +816,54 @@ public:
         }
         return false;
     }
-
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
     virtual void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
     {
         NodeType::load(dlg,ns,p);
         dlg.loader().addStringProperty("Filter Topic","Topic",ns.data().getValue<std::string>(p,"Topic")); // field[2]
+    }
+
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    virtual void save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
+        ns.data().setValue(p,"Topic",v.GetString().ToStdString());
+    }
+
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addStringProperty("Filter Topic",ns.data().getValue<std::string>(p,"Topic"));
+    }
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        std::string v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"Topic",v);
     }
 
 };
@@ -919,6 +1014,30 @@ public:
         ns.data().setValue(p,"Function",f);
     }
 
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addStringProperty("Function",ns.data().getValue<std::string>(p,"Function"));
+    }
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        std::string v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"Function",v);
+    }
 
 };
 

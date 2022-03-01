@@ -22,30 +22,6 @@ class IntegerNodeType  : public  NODEFLOW::ValueNodeType<int,NODEFLOW::Integer>
 {
 public:
     IntegerNodeType(const std::string &s) : ValueNodeType<int,NODEFLOW::Integer>(s) {}
-    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<int,NODEFLOW::Integer>::load(dlg,ns,p);
-        dlg.loader().addIntProperty("Value","Value",ns.data().getValue<int>(p,"Value"));
-    }
-    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<int,NODEFLOW::Integer>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
-        ns.data().setValue(p,"Value",v.GetInteger());
-    }
-
-    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<int,NODEFLOW::Integer>::load(dlg,ns,p);
-        dlg->addIntProperty("Value",ns.data().getValue<int>(p,"Value"));
-    }
-
-    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<int,NODEFLOW::Integer>::save(dlg,ns,p);
-        ns.data().setValue(p,"Value",dlg->getInt(NODEFLOW::PropField1));
-    }
-
 };
 /*!
  * \brief The DoubleNodeType class
@@ -54,17 +30,6 @@ class DoubleNodeType  :   public  NODEFLOW::ValueNodeType<double,NODEFLOW::Float
 {
 public:
     DoubleNodeType(const std::string &s) : NODEFLOW::ValueNodeType<double,NODEFLOW::Float>(s) {}
-    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<double,NODEFLOW::Float>::load(dlg,ns,p);
-        dlg.loader().addFloatProperty("Value","Value",ns.data().getValue<double>(p,"Value"));
-    }
-    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<double,NODEFLOW::Float>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
-        ns.data().setValue(p,"Value",v.GetDouble());
-    }
 };
 
 /*!
@@ -95,15 +60,29 @@ public:
 
     virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<double,NODEFLOW::Float>::load(dlg,ns,p);
-        dlg.loader().addUIntProperty("Value","Value",ns.data().getValue<int>(p,"Value"));
+        NodeType::load(dlg,ns,p);
+        dlg.loader().addIntProperty("Value","Value",ns.data().getValue<int>(p,"Value"));
     }
     virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
     {
-        ValueNodeType<double,NODEFLOW::Float>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
-        ns.data().setValue(p,"Value",int(v.GetInteger()));
+        NodeType::save(dlg,ns,p);
+        ns.data().setValue(p,"Value",dlg.loader().get<int>(NODEFLOW::PropField1));
     }
+
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addProp("Value",ns.data().getValue<int>(p,"Value"));
+    }
+
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        int v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"Value",v);
+    }
+
 };
 
 
@@ -114,17 +93,6 @@ class StringNodeType  :  public  NODEFLOW::ValueNodeType<std::string,NODEFLOW::S
 {
 public:
     StringNodeType(const std::string &s) : NODEFLOW::ValueNodeType<std::string,NODEFLOW::String>(s) {}
-    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<std::string,NODEFLOW::String>::load(dlg,ns,p);
-        dlg.loader().addStringProperty("Value","Value",ns.data().getValue<std::string>(p,"Value"));
-    }
-    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<std::string,NODEFLOW::String>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
-        ns.data().setValue(p,"Value",v.GetString().ToStdString());
-    }
 };
 /*!
  * \brief The BoolNodeType class
@@ -133,17 +101,6 @@ class BoolNodeType  :  public NODEFLOW::ValueNodeType<bool,NODEFLOW::Bool>
 {
 public:
     BoolNodeType(const std::string &s) : ValueNodeType<bool,NODEFLOW::Bool>(s) {}
-    virtual void load(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<bool,NODEFLOW::Bool>::load(dlg,ns,p);
-        dlg.loader().addBoolProperty("Value","Value",ns.data().getValue<bool>(p,"Value"));
-    }
-    virtual void save(PropertiesEditorDialog &dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
-    {
-        ValueNodeType<bool,NODEFLOW::Bool>::save(dlg,ns,p);
-        wxVariant v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
-        ns.data().setValue(p,"Value",v.GetBool());
-    }
 };
 /*!
  * \brief The TimerNodeType class
@@ -294,6 +251,31 @@ public:
         NodeType::save(dlg,ns,p);
         wxAny v = dlg.loader().fields()[NODEFLOW::PropField1]->GetValue();
         ns.data().setValue(p,"Value",v.As<int>());
+    }
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void load(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::load(dlg,ns,p);
+        dlg->addProp("Interval(ms)",ns.data().getValue<int>(p,"Value"));
+    }
+
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void save(NODEFLOW::WebProperties *dlg,NODEFLOW::NodeSet &ns,MRL::PropertyPath p)
+    {
+        NodeType::save(dlg,ns,p);
+        int v;
+        dlg->get(NODEFLOW::PropField1,v);
+        ns.data().setValue(p,"Value",v);
     }
 
 };
