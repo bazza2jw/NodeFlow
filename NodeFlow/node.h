@@ -179,6 +179,12 @@ public:
      */
     void getNodeEdges(EdgeIdSet &edgeDrawSet);
 
+    /*!
+     * \brief process
+     * hook for periodic processing at the node level
+     */
+    virtual void process() {}
+
 };
 
 typedef std::unique_ptr<Node> NodePtr;

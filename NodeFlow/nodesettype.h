@@ -204,6 +204,21 @@ public:
      */
     void load(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::PropertyPath p);
 
+    /*!
+     * \brief load
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void load(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p);
+    /*!
+     * \brief save
+     * \param dlg
+     * \param ns
+     * \param p
+     */
+    void save(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p);
+
 
 };
 }

@@ -10,9 +10,11 @@
  * A PARTICULAR PURPOSE.
  */
 
+
 #include "nodesettype.h"
 #include "NodeFlowEditorDialog.h"
 #include "NodeEditorPanel.h"
+#include "webproperties.h"
 
 /*!
  * \brief The NodeSetPropertiesEditorDialog class
@@ -85,6 +87,30 @@ void NODEFLOW::NodeSetType::save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::Pr
     NODEFLOW::NodeType::save(dlg,ns,p);
     wxVariant v = dlg.loader().fields()[PropField1]->GetValue();
     ns.data().setValue(p,"NodeSet",v.GetString().ToStdString());
+}
+
+/*!
+ * \brief NODEFLOW::NodeSetType::load
+ * \param dlg
+ * \param ns
+ * \param p
+ */
+void NODEFLOW::NodeSetType::load(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p)
+{
+    NodeType::load(dlg,ns, p);
+    dlg->addStringProperty("Node Set",ns.data().getValue<std::string>(p,"NodeSet"));
+}
+/*!
+ * \brief NODEFLOW::NodeSetType::save
+ * \param dlg
+ * \param ns
+ * \param p
+ */
+void NODEFLOW::NodeSetType::save(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p)
+{
+    NodeType::save(dlg,ns, p);
+    ns.data().setValue(p,"NodeSet",dlg->getString(PropField1));
+
 }
 
 /*!

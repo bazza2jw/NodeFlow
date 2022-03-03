@@ -128,6 +128,15 @@ namespace NODEFLOW
             Wt::WComboBox *p = dynamic_cast<Wt::WComboBox *>(_table->elementAt(i,1)->widget(0));
             return p->currentIndex();
         }
+
+        void setRowHeights()
+        {
+          Wt::WLength h(5,Wt::LengthUnit::Percentage );
+          for(unsigned i = 0; i < _fieldId; i++)
+          {
+            _table->rowAt(i)->setHeight(h);
+          }
+        }
     };
 
     /*!
@@ -161,6 +170,7 @@ namespace NODEFLOW
             {
                 t->load(_props,_set,p);
             }
+            _props->setRowHeights();
             WebDialogBase::setup();
         }
     };

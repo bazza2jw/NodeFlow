@@ -11,16 +11,12 @@
 #include <wx/thread.h>
 #include <Wt/WServer.h>
 #include "NodeFlow/mqttconnection.h"
-#include "NodeFlow/nodeset.h"
-#include "nodeflowthread.h"
 
 
 
-    class BuiApp : public wxAppConsole
+    class BuiApp : public wxApp
     {
         std::unique_ptr<Wt::WServer> _webThread; //! Web server thread
-        std::unique_ptr<NODEFLOW::NodeFlowThread> _flowThread;
-        wxString _flowName;
     public:
         BuiApp();
         
@@ -30,8 +26,6 @@
          * \return
          */
         bool OnInit();
-
-        int onRun();
         /*!
          * \brief OnInitCmdLine
          * \param parser

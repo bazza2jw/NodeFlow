@@ -17,6 +17,8 @@ add_subdirectory(NodeFlow)
 add_subdirectory(NodeEditor)
 add_subdirectory(Modules)
 add_subdirectory(NodeFlowWeb)
+add_subdirectory(NodeFlowExec)
+
 #
 
 

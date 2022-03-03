@@ -9,15 +9,18 @@ NODEFLOW::WebProperties::WebProperties(NodeSet &set, NodePtr &n) :_set(set),_nod
 {
     auto layout = std::make_unique<Wt::WFitLayout>();
     auto boxLayout = std::make_unique<Wt::WVBoxLayout>();
-    _table = boxLayout->addWidget(std::make_unique<Wt::WTable>());
-    //
-    Wt::WLength tableHeight(10,Wt::LengthUnit::ViewportWidth );
-    Wt::WLength tableWidth(50,Wt::LengthUnit::ViewportWidth );
-    //
+
     Wt::WCssDecorationStyle s;
     Wt::WFont f;
-    f.setSize(Wt::FontSize::XXLarge);
+    f.setSize(Wt::FontSize::Small);
     s.setFont(f);
+    setDecorationStyle(s);
+
+    _table = boxLayout->addWidget(std::make_unique<Wt::WTable>());
+    //
+    Wt::WLength tableHeight(30,Wt::LengthUnit::ViewportWidth );
+    Wt::WLength tableWidth(50,Wt::LengthUnit::ViewportWidth );
+    //
     //
     _table->setDecorationStyle(s);
     _table->setHeaderCount(1);

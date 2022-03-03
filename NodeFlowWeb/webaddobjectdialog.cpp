@@ -70,7 +70,7 @@ void NODEFLOW::WebOpenFlowForm::setup() {
     wxDir d(NODEFLOW_ROOT_DIR "/sets");
     if (d.IsOpened()) {
         wxString f;
-        if (d.GetFirst(&f, "*.nfs", wxDIR_FILES)) {
+        if (d.GetFirst(&f, "*.nfl", wxDIR_FILES)) {
             do {
                 std::string fn = f.ToStdString();
                 _files->addItem(fn);

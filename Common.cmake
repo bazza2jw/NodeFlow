@@ -101,12 +101,12 @@ add_definitions(-DUSE_WT)
 set(WTLIBS  -lwt -lwthttp)
 #
 link_directories(/usr/local/MRL/lib)
+
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(/usr/local/MRL/include)
 #
 # Enable the GUI build
 add_definitions(-DUSE_GUI )
-set(EXTRA_LIB_FLAGS MrlLib atomic pthread rt m)
-
+set(EXTRA_LIB_FLAGS MrlLib open62541cpp sqlite3 mysqlpp modbus mosquittopp socket++ atomic pthread rt m)
 
 

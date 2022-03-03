@@ -229,7 +229,9 @@ enum
     PropField1,
     PropField2,
     PropField3,
-    PropField4
+    PropField4,
+    PropField5,
+    PropField6
 };
 
 class NodeType

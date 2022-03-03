@@ -65,7 +65,9 @@ public:
         INPUT_SELECT,
         OUTPUT_SELECT
     };
-
+    /*!
+     * \brief The HitStruct struct
+     */
     struct HitStruct
     {
         // data on hit
@@ -207,7 +209,10 @@ public:
             p->toPath(path);
         }
     }
-    //
+    /*!
+     * \brief data
+     * \return
+     */
     MRL::VariantPropertyTree & data() {
         return  _data;
     }
@@ -351,7 +356,6 @@ public:
     //
     virtual void load();
     virtual void save();
-
     //
     VALUE & inValue()  {
         return _inValue;
@@ -383,9 +387,17 @@ public:
      * \return
      */
     int hitTest(wxPoint &pt, HitStruct &);
-
+    /*!
+     * \brief makeConnectionSelect
+     * \param pt
+     * \param startPoint
+     * \param state
+     * \param start
+     */
     void makeConnectionSelect(wxPoint &pt, wxPoint &startPoint, int state, NodeSet::HitStruct &start);
 
 };
+
+typedef std::unique_ptr<NodeSet> NodeSetRef;
 }
 #endif // NODESET_H

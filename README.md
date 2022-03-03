@@ -33,7 +33,7 @@ Data packets (JSON Values) can be routed by topic. Topic can be changed.
 Program Structure
 =================
 
-Generally the functions are performed by NodeType derived classes. The other classes hold data. In some cases classes derived form Node are required to store extra data items.
+Generally the functions are performed by NodeType derived classes. The other classes hold data. In some cases classes derived form Node are required to store extra data items (eg serial ports, MQTT).
 
 
 The NodeSet class is the graph of the nodes (Node) and the connections (Edge). The NodeSet is the execution context.  To run a flow  the NodeSet is executed/processed (by calling NodeSet::step). The NodeSet::start function is called to initialise all nodes. A NodeSet has a Variant Property Tree to store the node layout and node properties and anything else that springs to mind.
@@ -71,7 +71,7 @@ Node connections have colour coded type. Nodes must be of the same type (Bool, I
 Web Interface
 =============
 
-The web version of the Node Editor has been written using Wt. The port is 8083. 
+The web version of the Node Editor has been written using Wt. The port is 8083. Right click on the canvas to add nodes.
 
 
 Building
@@ -79,14 +79,18 @@ Building
 
 Use cmake to build. 
 
-The GUI is wxWidgets based. However changing to Qt or Wt (for web based UI) should not be complex.
-
+The GUI is wxWidgets based. However changing to Qt or Wt (for web based UI) should not be complex
 The MrlLib from the OpcServant project is required. Boost is required.
 
 Look at the plugins for how to extend the node set and how to implement functions
 
 It is expected to be able to embed Node Flow in other applications as a visual alternative to scripting and configuration. 
 
+
+Sub-Flows
+=========
+
+There is a Node that encapsulates another Node Set, in effect a sub flow. Currently duplicate the node set file and modify for a given instance. 
 
 
 
