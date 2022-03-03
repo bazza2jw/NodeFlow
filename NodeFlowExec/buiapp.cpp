@@ -18,7 +18,7 @@ bool BuiApp::OnInit()
     NODEFLOW::Plugin::loadPlugins("/usr/local/NodeFlow/modules"); // load all plugins
     NODEFLOW::Plugin::initialiseAll(); // call the initialise function
 
-//    static const char *av[] = {"OpcServant", "--docroot=.;/resources", "--http-address=0.0.0.0", "--http-port=8083","--resources-dir=./resources"};
+//    static const char *av[] = {"NodeFlow", "--docroot=.;/resources", "--http-address=0.0.0.0", "--http-port=8083","--resources-dir=./resources"};
 //    //
 //    std::string av0 = wxAppConsole::argv[0].ToStdString();
 //    _webThread = std::make_unique<Wt::WServer>(av0);

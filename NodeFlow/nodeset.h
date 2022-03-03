@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2022 -  B. J. Hill
  *
- * This file is part of OpcServant. OpcServant C++ classes are free software: you can
+ * This file is part of NodeFlow. NodeFlow C++ classes are free software: you can
  * redistribute it and/or modify it under the terms of the Mozilla Public
  * License v2.0 as stated in the LICENSE file .
  *
@@ -50,7 +50,7 @@ class NodeSet
     //
     NodePtr _null;
     //
-    MRL::VariantPropertyTree _data;
+    MRL::VariantPropertyTree _data; // node and edge data
     //
     VALUE _inValue; // value input to the set read by node set input nodes
     VALUEQUEUE _outValue; // written by node set output nodes

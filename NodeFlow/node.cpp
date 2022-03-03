@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2022 -  B. J. Hill
  *
- * This file is part of OpcServant. OpcServant C++ classes are free software: you can
+ * This file is part of NodeFlow. NodeFlow C++ classes are free software: you can
  * redistribute it and/or modify it under the terms of the Mozilla Public
  * License v2.0 as stated in the LICENSE file .
  *
@@ -87,7 +87,10 @@ void NODEFLOW::Node::save(NodeSet &s)
     }
 }
 
-
+/*!
+ * \brief NODEFLOW::Node::getNodeEdges
+ * \param edgeDrawSet
+ */
 void NODEFLOW::Node::getNodeEdges(EdgeIdSet &edgeDrawSet)
 {
         // draw the connected edges

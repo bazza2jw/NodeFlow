@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2022 -  B. J. Hill
  *
- * This file is part of OpcServant. OpcServant C++ classes are free software: you can
+ * This file is part of NodeFlow. NodeFlow C++ classes are free software: you can
  * redistribute it and/or modify it under the terms of the Mozilla Public
  * License v2.0 as stated in the LICENSE file .
  *
@@ -154,7 +154,7 @@ unsigned NODEFLOW::NodeSet::addConnect(unsigned nodeFrom, unsigned out, unsigned
                                 //
                                 // although JSON values are used many operations are type sensitive
                                 // this is the type of the payload
-                                // a value is a map of values not just the payload
+                                // a value is a map of Json values not just the payload
                                 // there are type conversion nodes
                                 //
                                 //

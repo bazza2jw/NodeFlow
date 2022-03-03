@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2022 -  B. J. Hill
  *
- * This file is part of OpcServant. OpcServant C++ classes are free software: you can
+ * This file is part of NodeFlow. NodeFlow C++ classes are free software: you can
  * redistribute it and/or modify it under the terms of the Mozilla Public
  * License v2.0 as stated in the LICENSE file .
  *
@@ -49,7 +49,9 @@ class NodeType;
 
 typedef Json::Value VALUE;
 typedef std::map<unsigned,VALUE> VALUEMAP;
-
+/*!
+ * \brief The Node class
+ */
 class Node
 {
     //
