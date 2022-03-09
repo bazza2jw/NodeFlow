@@ -12,6 +12,10 @@
 
 #include "edge.h"
 #include "nodeset.h"
+/*!
+ * \brief NODEFLOW::Edge::load
+ * \param s
+ */
 void NODEFLOW::Edge::load(NodeSet &s)
 {
     MRL::VariantPropertyTree &t = s.data();
@@ -24,7 +28,10 @@ void NODEFLOW::Edge::load(NodeSet &s)
     _to.setId(t.getValue<unsigned>(p,"ToId"));
     //
 }
-
+/*!
+ * \brief NODEFLOW::Edge::save
+ * \param s
+ */
 void NODEFLOW::Edge::save(NodeSet &s)
 {
     MRL::VariantPropertyTree &t = s.data();

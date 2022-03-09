@@ -51,12 +51,17 @@ typedef Json::Value VALUE;
 typedef std::map<unsigned,VALUE> VALUEMAP;
 /*!
  * \brief The Node class
+ * A node is a node in the graph
+ * Nodes have inputs and outputs
+ * Node data (propereties) is is the node sets property tree
+ * Generally flow functionality is in the NodeType class
+ * For interfaces to things like MQTT , serial , I2C etc derive a class from Node and add the per node data
  */
 class Node
 {
     //
-    unsigned _id = 0;
-    unsigned  _type = 0;
+    unsigned _id = 0; // the node id in the set
+    unsigned  _type = 0; // the node type - keys the NodeType instance that provides the functions
     std::string _sid; // id string
     wxPoint _location; // location of the node
     //
@@ -136,8 +141,8 @@ public:
     //
     void setCalculated(bool f = true) { _calculated = f;}
     //
-    std::vector<ItemListPtr> &inputs()  { return _inputs;}  // the inputs to the node
-    std::vector<ItemListPtr> &outputs() { return _outputs;} // the outputs from the node
+    std::vector<ItemListPtr> &inputs()  { return _inputs;}  // the inputs to the node - a list of lists
+    std::vector<ItemListPtr> &outputs() { return _outputs;} // the outputs from the node - a list of lists
 
     void setInputs(size_t n) {
         _inputs.resize(n);

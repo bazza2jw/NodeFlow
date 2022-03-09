@@ -267,7 +267,13 @@ void NODEFLOW::NodeType::save(PropertiesEditorDialog &dlg,NodeSet &ns,MRL::Prope
 // Web properties dialog
 //
 #ifdef USE_WT
-
+/*!
+ * \brief NODEFLOW::NodeType::properties
+ * \param parent
+ * \param ns
+ * \param nodeId
+ * \return
+ */
 bool NODEFLOW::NodeType::properties(Wt::WWidget *parent, NodeSet &ns, unsigned nodeId)
 {
     MRL::PropertyPath p;
@@ -277,6 +283,12 @@ bool NODEFLOW::NodeType::properties(Wt::WWidget *parent, NodeSet &ns, unsigned n
     NODEFLOW::WebDialogBase::showDialog<NODEFLOW::WebPropertiesDialog>(parent,pd);
     return true; // does not block
 }
+/*!
+ * \brief NODEFLOW::NodeType::load
+ * \param dlg
+ * \param ns
+ * \param p
+ */
 void NODEFLOW::NodeType::load(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p)
 {
     dlg->addStringProperty("Name",ns.data().getValue<std::string>(p,"Name")); // field[0]
@@ -284,6 +296,12 @@ void NODEFLOW::NodeType::load(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p
     std::string cs = ns.data().getValue<std::string>(p,"Colour");
     dlg->addColourProperty("Node Colour",cs); // field[2]
 }
+/*!
+ * \brief NODEFLOW::NodeType::save
+ * \param dlg
+ * \param ns
+ * \param p
+ */
 void NODEFLOW::NodeType::save(WebProperties *dlg,NodeSet &ns,MRL::PropertyPath p)
 {
     ns.data().setValue(p,"Name",dlg->getString(PropName));

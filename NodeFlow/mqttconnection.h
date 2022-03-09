@@ -59,6 +59,7 @@ namespace NODEFLOW
             /*!
              * \brief on_message
              * \param message
+             * Receive a message
              */
             void on_message(const struct mosquitto_message *message);
             /*!

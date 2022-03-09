@@ -1,5 +1,5 @@
-#ifndef WEBDIALOG_H
-#define WEBDIALOG_H
+#ifndef NODE_FLOW_WEBDIALOG_H
+#define NODE_FLOW_WEBDIALOG_H
 /*
  * Copyright (C) 2022 -  B. J. Hill
  *

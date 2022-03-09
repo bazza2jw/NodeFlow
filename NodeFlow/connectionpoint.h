@@ -21,7 +21,10 @@ typedef enum
     Input
 } ConnectionPointType;
 
-
+/*!
+ * \brief The ConnectionPoint class
+ * A connection point
+ */
 class ConnectionPoint
 {
     unsigned _node = 0; // node id

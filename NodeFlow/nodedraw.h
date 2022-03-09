@@ -31,6 +31,7 @@
 //
 // This resolves platform differences - there is a lot of same but different code
 // a lot of things are the same but use different functions calls and formats
+// The Wt version has to be structured differently to the wxWidgets (or Qt)
 
 namespace NODEFLOW
 {
@@ -75,6 +76,10 @@ public:
     }
 };
 
+/*!
+ * \brief The NodeDrawBitmap class
+ * Draw to a bit map
+ */
 class NodeDrawBitmap : public NodeDrawWx
 {
     wxSize                              _size;

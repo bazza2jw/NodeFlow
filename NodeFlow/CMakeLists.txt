@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 set(MODULE NodeFlow)
 project (${MODULE})
 
-set(CMAKE_INSTALL_PREFIX ${PIROOT}/usr/local/MRL5/lib)
+set(CMAKE_INSTALL_PREFIX ${PIROOT}/usr/local/NodeFlow/lib)
 
 set(CMAKE_CXX_STANDARD 17)
 add_definitions (-DUNICODE -D_UNICODE)
